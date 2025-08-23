@@ -8,6 +8,7 @@ class Follow < ApplicationRecord
              inverse_of: :follows
 
   validate :cannot_follow_self
+  validates_uniqueness_of :followed_id, scope: :follower_id
 
   private
 
