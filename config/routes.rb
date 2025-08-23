@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
+  resources :follows
+
+  namespace :users do
+    post :followings, to: "followings#create"
+    delete :followings, to: "followings#destroy"
+  end
   resources :users
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
