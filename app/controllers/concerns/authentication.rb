@@ -14,6 +14,6 @@ module Authentication
   private
 
     def require_authentication
-      Current.user = User.find_by request.headers['user_id']
+      Current.user = User.find cookies[:user_id]
     end
 end
