@@ -56,3 +56,6 @@ For simplicity:
    twitter incident): need ~100 servers (assuming 250 req/s per Rails server). 
    Sleep creation at 1kB/req = 25MB/s, well below SSD write speeds (6-12GB/s).
 5. **Database Scaling** - Use read replicas for read traffic distribution, sharding for write traffic distribution when Ruby/database becomes the bottleneck.
+6. **Pregeneration** - After users update sleeps, enqueue background jobs to
+   pregenerate prev_week_sleeps data for followers. Read from the
+   pregenerated data.
