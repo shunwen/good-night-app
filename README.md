@@ -46,6 +46,7 @@ For simplicity:
 3. **Follow limits** - Set upper limit per user (e.g. 5000 like X) to prevent excessive growth.
 4. **Counter caches** - APIs don't need counts currently. If added later, use counter caches for expensive COUNT queries.
 5. **Caching** - Cache prev_week_sleeps results per user for 5+ minutes, or implement cache invalidation based on follows' sleep updates.
+6. **Response compression**
 
 ### Advanced
 1. **Data Volume** - 1 sleep record ≈ 120 bytes. 100 years per user ≈ 4MB. Global scale (8B users) ≈ 32PB over 100 years.
