@@ -1,12 +1,18 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
-  test "follow the other user" do
+  test "follow and unfollow the other user" do
     @user = users(:one)
     @other_user = users(:two)
 
-    @user.following_others << @other_user
+    @user.follow(@other_user)
 
     assert @other_user.followers.include?(@user)
+
+    assert @user.following?(@other_user)
+
+    @user.unfollow(@other_user)
+
+    assert_not @user.following?(@other_user)
   end
 end
