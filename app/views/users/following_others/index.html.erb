@@ -3,9 +3,9 @@
 <div class="container">
   <h1>People You're Following</h1>
 
-  <% if @followings.any? %>
+  <% if @following_others.any? %>
     <div class="followings-list">
-      <% @followings.each do |user| %>
+      <% @following_others.each do |user| %>
         <div class="following-card">
           <div class="user-info">
             <h3><%= user.name %></h3>

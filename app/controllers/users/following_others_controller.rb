@@ -1,39 +1,37 @@
 class Users::FollowingOthersController < ApplicationController
   def index
-    @followings = Current.user.following_others.includes(:sleeps)
+    @following_others = Current.user.following_others
     
     respond_to do |format|
       format.html
-      format.json { render json: @followings }
+      format.json { render json: @following_others }
     end
   end
 
   def create
-    @user = User.find(params[:followed_id])
-    @follow = Current.user.followings.build(followed: @user)
+    @other = User.find(params[:followed_id])
 
     respond_to do |format|
-      if @follow.save
-        format.html { redirect_to @user, notice: "You are now following #{@user.name}." }
-        format.json { render json: @follow, status: :created }
+      if Current.user.follow(@other)
+        format.html { redirect_to @other, notice: "You are now following #{@other.name}." }
+        format.json { render json: @other, status: :created }
       else
-        format.html { redirect_to @user, alert: "Unable to follow #{@user.name}." }
-        format.json { render json: @follow.errors, status: :unprocessable_content }
+        format.html { redirect_to @other, alert: "Unable to follow #{@other.name}." }
+        format.json { render json: @other.errors, status: :unprocessable_content }
       end
     end
   end
 
   def destroy
-    @follow = Current.user.followings.find(params[:id])
-    @user = @follow.followed
+    @other = Current.user.following_others.find(params[:id])
 
     respond_to do |format|
-      if @follow.destroy
-        format.html { redirect_to @user, notice: "You unfollowed #{@user.name}." }
+      if Current.user.unfollow(@other)
+        format.html { redirect_to @other, notice: "You unfollowed #{@other.name}." }
         format.json { head :no_content }
       else
-        format.html { redirect_to @user, alert: "Unable to unfollow #{@user.name}." }
-        format.json { render json: { error: "Unable to unfollow #{@user.name}." }, status: :unprocessable_content }
+        format.html { redirect_to @other, alert: "Unable to unfollow #{@other.name}." }
+        format.json { render json: { error: "Unable to unfollow #{@other.name}." }, status: :unprocessable_content }
       end
     end
   end

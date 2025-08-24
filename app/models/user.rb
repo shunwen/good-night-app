@@ -22,4 +22,12 @@ class User < ApplicationRecord
   def following?(user)
     following_others.include?(user)
   end
+
+  def follow(user)
+    following_others << user unless self == user || following?(user)
+  end
+
+  def unfollow(user)
+    following_others.delete(user) if following?(user)
+  end
 end
