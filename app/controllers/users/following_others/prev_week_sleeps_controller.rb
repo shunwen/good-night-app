@@ -10,7 +10,6 @@ class Users::FollowingOthers::PrevWeekSleepsController < ApplicationController
       Sleep.joins(:user)
         .where(user: Current.user.following_others)
         .where(started_at_utc: Time.current.prev_week.all_week)
-        .includes(:user)
         .order(duration: :desc)
         .limit(per_page + 1)
         .offset(offset)
