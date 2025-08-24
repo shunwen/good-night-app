@@ -124,4 +124,36 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     assert_equal long_sleep.id, json_response.first["id"]
     assert_equal short_sleep.id, json_response.last["id"]
   end
+
+  test "should sort sleeps without stopped_at_raw or duration at the bottom" do
+    @user_one.following_others << @user_two
+    
+    prev_week_start = Time.current.prev_week.beginning_of_week
+    
+    # Sleep with duration (should be at top)
+    completed_sleep = @user_two.sleeps.create!(
+      started_at_raw: prev_week_start.strftime("%Y-%m-%d 22:00:00"),
+      stopped_at_raw: (prev_week_start + 1.day).strftime("%Y-%m-%d 06:00:00")
+    )
+    
+    # Sleep without stopped_at_raw (still sleeping, should be at bottom)
+    ongoing_sleep = @user_two.sleeps.create!(
+      started_at_raw: (prev_week_start + 1.day).strftime("%Y-%m-%d 23:00:00")
+      # No stopped_at_raw - duration should be nil
+    )
+    
+    get users_following_others_prev_week_sleeps_url, as: :json
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    assert_equal 2, json_response.length
+    
+    # Completed sleep should be first (has duration)
+    assert_equal completed_sleep.id, json_response.first["id"]
+    assert_not_nil json_response.first["duration"]
+    
+    # Ongoing sleep should be last (no duration)
+    assert_equal ongoing_sleep.id, json_response.last["id"]
+    assert_nil json_response.last["duration"]
+  end
 end
