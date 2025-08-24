@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       resources :prev_week_sleeps, only: [:index]
     end
   end
-  resources :users
+  resources :users, only: [:index, :show, :new, :create, :destroy]
   
   get 'api_test', to: 'api_test#index'
   post 'api_test/impersonate', to: 'api_test#impersonate'

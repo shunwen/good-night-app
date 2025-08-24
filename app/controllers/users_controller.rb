@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  allow_unauthenticated_access only: %i[ index show new create]
+  allow_unauthenticated_access only: %i[new create]
 
-  before_action :set_user, only: %i[ show edit update destroy ]
+  before_action :set_user, only: %i[show destroy]
 
   # GET /users or /users.json
   def index
@@ -15,10 +15,6 @@ class UsersController < ApplicationController
   # GET /users/new
   def new
     @user = User.new
-  end
-
-  # GET /users/1/edit
-  def edit
   end
 
   # POST /users or /users.json
@@ -36,19 +32,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # PATCH/PUT /users/1 or /users/1.json
-  def update
-    respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to @user, notice: "User was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @user }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
   # DELETE /users/1 or /users/1.json
   def destroy
     @user.destroy!
@@ -60,6 +43,7 @@ class UsersController < ApplicationController
   end
 
   private
+
     # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = User.find(params.expect(:id))
@@ -67,6 +51,6 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.expect(user: [ :name ])
+      params.expect(user: [:name])
     end
 end

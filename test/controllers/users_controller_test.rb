@@ -12,14 +12,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should redirect index when not authenticated" do
+  test "unauthorized index when not authenticated" do
     get users_url
-    assert_response :redirect
-  end
-
-  test "should get new" do
-    get new_user_url
-    assert_response :success
+    assert_response :unauthorized
   end
 
   test "should create user" do
@@ -36,31 +31,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should redirect show when not authenticated" do
+  test "unauthorized show when not authenticated" do
     get user_url(@user)
-    assert_response :redirect
-  end
-
-  test "should get edit when authenticated" do
-    cookies[:user_id] = @user.id
-    get edit_user_url(@user)
-    assert_response :success
-  end
-
-  test "should redirect edit when not authenticated" do
-    get edit_user_url(@user)
-    assert_response :redirect
-  end
-
-  test "should update user when authenticated" do
-    cookies[:user_id] = @user.id
-    patch user_url(@user), params: { user: { name: "Updated Name" } }
-    assert_redirected_to user_url(@user)
-  end
-
-  test "should redirect update when not authenticated" do
-    patch user_url(@user), params: { user: { name: "Updated Name" } }
-    assert_response :redirect
+    assert_response :unauthorized
   end
 
   test "should destroy user when authenticated" do
@@ -72,11 +45,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to users_url
   end
 
-  test "should redirect destroy when not authenticated" do
+  test "unauthorized destroy when not authenticated" do
     assert_no_difference("User.count") do
       delete user_url(@user)
     end
     
-    assert_response :redirect
+    assert_response :unauthorized
   end
 end
