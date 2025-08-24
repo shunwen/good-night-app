@@ -4,7 +4,7 @@ class Sleep < ApplicationRecord
   validates :started_at_raw, presence: true
 
   before_save :set_started_at_utc
-  before_save :set_duration, if: :stopped_at_raw?
+  before_save :set_duration
 
   private
 
@@ -13,6 +13,9 @@ class Sleep < ApplicationRecord
     end
 
     def set_duration
-      self.duration = DateTime.parse(stopped_at_raw).to_i - started_at_utc.to_i
+      self.duration =
+        if stopped_at_raw?
+          DateTime.parse(stopped_at_raw).to_i - started_at_utc.to_i
+        end
     end
 end
