@@ -1,0 +1,24 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Following Users' Sleep Records" %>
+
+<h1>Following Users' Sleep Records</h1>
+
+<% if @sleeps.any? %>
+  <div id="sleeps">
+    <% @sleeps.each do |sleep| %>
+      <%= render "users/sleeps/sleep", sleep: sleep %>
+      <p>
+        <%= link_to "View details", users_sleep_path(sleep) %>
+      </p>
+    <% end %>
+  </div>
+<% else %>
+  <p>No sleep records found from users you're following.</p>
+  <p><%= link_to "Find users to follow", users_path %></p>
+<% end %>
+
+<div>
+  <%= link_to "My Sleep Records", users_sleeps_path %> |
+  <%= link_to "All Users", users_path %>
+</div>

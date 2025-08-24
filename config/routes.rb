@@ -5,8 +5,16 @@ Rails.application.routes.draw do
     resources :sleeps
     post :followings, to: "followings#create"
     delete :followings, to: "followings#destroy"
+    
+    namespace :following_others do
+      resources :sleeps, only: [:index]
+    end
   end
   resources :users
+  
+  get 'api_test', to: 'api_test#index'
+  post 'api_test/impersonate', to: 'api_test#impersonate'
+  delete 'api_test/clear_auth', to: 'api_test#clear_auth'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
