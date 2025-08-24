@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     delete :followings, to: "followings#destroy"
     
     namespace :following_others do
-      resources :sleeps, only: [:index]
+      resources :prev_week_sleeps, only: [:index]
     end
   end
   resources :users
