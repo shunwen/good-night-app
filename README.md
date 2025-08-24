@@ -2,7 +2,8 @@
 
 ## API Test Page
 
-Clone repo, set up database, start Rails server, then test APIs at 
+Clone repo, add master.key, set up database, start Rails server, then test 
+APIs at 
 https://localhost:3000/api_test (created with Claude Code,
 not all APIs are supported here).
 
