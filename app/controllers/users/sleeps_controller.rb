@@ -28,8 +28,8 @@ class Users::SleepsController < ApplicationController
         format.html { redirect_to users_sleep_path(@sleep), notice: "Sleep was successfully created." }
         format.json { render :show, status: :created, location: users_sleep_url(@sleep) }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @sleep.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @sleep.errors, status: :unprocessable_content }
       end
     end
   end
@@ -41,8 +41,8 @@ class Users::SleepsController < ApplicationController
         format.html { redirect_to users_sleep_path(@sleep), notice: "Sleep was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: users_sleep_url(@sleep) }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @sleep.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @sleep.errors, status: :unprocessable_content }
       end
     end
   end

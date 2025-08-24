@@ -83,9 +83,9 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
     assert_response :no_content
   end
 
-  test "should return unprocessable entity for invalid sleep as json" do
+  test "should return unprocessable content for invalid sleep as json" do
     post users_sleeps_url, params: { sleep: { started_at_raw: nil } }, as: :json
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_equal "application/json", response.media_type
   end
 end
