@@ -56,7 +56,8 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     assert_equal "application/json", response.media_type
     
     json_response = JSON.parse(response.body)
-    assert_equal [], json_response
+    assert_equal [], json_response["sleeps"]
+    assert_equal false, json_response["pagination"]["has_next_page"]
   end
 
   test "should only show sleep records from previous week" do
@@ -86,13 +87,13 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     assert_response :success
     
     json_response = JSON.parse(response.body)
-    sleep_ids = json_response.map { |sleep| sleep["id"] }
+    sleep_ids = json_response["sleeps"].pluck('id')
     
     # Should only include previous week sleep
     assert_includes sleep_ids, prev_week_sleep.id
     assert_not_includes sleep_ids, this_week_sleep.id
     assert_not_includes sleep_ids, two_weeks_ago_sleep.id
-    assert_equal 1, json_response.length
+    assert_equal 1, json_response["sleeps"].length
   end
 
   test "should order sleep records by duration descending" do
@@ -117,12 +118,13 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     assert_response :success
     
     json_response = JSON.parse(response.body)
+    sleeps = json_response["sleeps"]
     
     # Should have sleeps ordered by duration desc (longest first)
-    durations = json_response.map { |sleep| sleep["duration"] }
+    durations = sleeps.map { |sleep| sleep["duration"] }
     assert_equal durations.sort.reverse, durations
-    assert_equal long_sleep.id, json_response.first["id"]
-    assert_equal short_sleep.id, json_response.last["id"]
+    assert_equal long_sleep.id, sleeps.first["id"]
+    assert_equal short_sleep.id, sleeps.last["id"]
   end
 
   test "should sort sleeps without stopped_at_raw or duration at the bottom" do
@@ -146,14 +148,62 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     assert_response :success
     
     json_response = JSON.parse(response.body)
-    assert_equal 2, json_response.length
+    sleeps = json_response["sleeps"]
+    assert_equal 2, sleeps.length
     
     # Completed sleep should be first (has duration)
-    assert_equal completed_sleep.id, json_response.first["id"]
-    assert_not_nil json_response.first["duration"]
+    assert_equal completed_sleep.id, sleeps.first["id"]
+    assert_not_nil sleeps.first["duration"]
     
     # Ongoing sleep should be last (no duration)
-    assert_equal ongoing_sleep.id, json_response.last["id"]
-    assert_nil json_response.last["duration"]
+    assert_equal ongoing_sleep.id, sleeps.last["id"]
+    assert_nil sleeps.last["duration"]
+  end
+
+  test "should paginate results" do
+    @user_one.following_others << @user_two
+    
+    prev_week_start = Time.current.prev_week.beginning_of_week
+    
+    # Create 3 sleep records from previous week
+    sleep1 = @user_two.sleeps.create!(
+      started_at_raw: prev_week_start.strftime("%Y-%m-%d 22:00:00"),
+      stopped_at_raw: (prev_week_start + 1.day).strftime("%Y-%m-%d 08:00:00") # 10 hours
+    )
+    
+    sleep2 = @user_two.sleeps.create!(
+      started_at_raw: (prev_week_start + 1.day).strftime("%Y-%m-%d 23:00:00"),
+      stopped_at_raw: (prev_week_start + 2.days).strftime("%Y-%m-%d 07:00:00") # 8 hours
+    )
+    
+    sleep3 = @user_two.sleeps.create!(
+      started_at_raw: (prev_week_start + 2.days).strftime("%Y-%m-%d 22:30:00"),
+      stopped_at_raw: (prev_week_start + 3.days).strftime("%Y-%m-%d 06:30:00") # 8 hours
+    )
+    
+    # Page 1 with per_page=2
+    get users_following_others_prev_week_sleeps_url, params: { page: 1, per_page: 2 }, as: :json
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    
+    assert_equal 2, json_response["sleeps"].length
+    assert_equal 1, json_response["pagination"]["current_page"]
+    assert_equal 2, json_response["pagination"]["per_page"]
+    assert_equal true, json_response["pagination"]["has_next_page"]
+    
+    # Should have the 2 longest sleeps (sleep1 first due to longest duration)
+    assert_equal sleep1.id, json_response["sleeps"][0]["id"]
+    
+    # Page 2 with per_page=2
+    get users_following_others_prev_week_sleeps_url, params: { page: 2, per_page: 2 }, as: :json
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    
+    assert_equal 1, json_response["sleeps"].length
+    assert_equal 2, json_response["pagination"]["current_page"]
+    assert_equal 2, json_response["pagination"]["per_page"]
+    assert_equal false, json_response["pagination"]["has_next_page"]
   end
 end
