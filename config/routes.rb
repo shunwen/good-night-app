@@ -3,8 +3,7 @@ Rails.application.routes.draw do
 
   namespace :users do
     resources :sleeps
-    post :followings, to: "followings#create"
-    delete :followings, to: "followings#destroy"
+    resources :following_others, only: [:index, :create, :destroy]
     
     namespace :following_others do
       resources :prev_week_sleeps, only: [:index]

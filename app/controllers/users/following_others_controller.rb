@@ -1,4 +1,4 @@
-class Users::FollowingsController < ApplicationController
+class Users::FollowingOthersController < ApplicationController
   def index
     @followings = Current.user.following_others.includes(:sleeps)
     
@@ -18,22 +18,22 @@ class Users::FollowingsController < ApplicationController
         format.json { render json: @follow, status: :created }
       else
         format.html { redirect_to @user, alert: "Unable to follow #{@user.name}." }
-        format.json { render json: @follow.errors, status: :unprocessable_entity }
+        format.json { render json: @follow.errors, status: :unprocessable_content }
       end
     end
   end
 
   def destroy
-    @user = User.find(params[:followed_id])
-    @follow = Current.user.followings.find_by(followed: @user)
+    @follow = Current.user.followings.find(params[:id])
+    @user = @follow.followed
 
     respond_to do |format|
-      if @follow&.destroy
+      if @follow.destroy
         format.html { redirect_to @user, notice: "You unfollowed #{@user.name}." }
         format.json { head :no_content }
       else
         format.html { redirect_to @user, alert: "Unable to unfollow #{@user.name}." }
-        format.json { render json: { error: "Unable to unfollow #{@user.name}." }, status: :unprocessable_entity }
+        format.json { render json: { error: "Unable to unfollow #{@user.name}." }, status: :unprocessable_content }
       end
     end
   end
