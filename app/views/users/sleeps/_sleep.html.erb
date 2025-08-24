@@ -17,7 +17,8 @@
 
     <p>
       <strong>Duration:</strong>
-      <%= pluralize((sleep.duration / 3600).round(1), "hour") %>
+      <%= pluralize((sleep.duration / 3600), "hour") %>
+      <%= pluralize((sleep.duration % 3600) / 60, "minute") %>
     </p>
   <% end %>
 
