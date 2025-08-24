@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get 'api_test', to: 'api_test#index'
   post 'api_test/impersonate', to: 'api_test#impersonate'
   delete 'api_test/clear_auth', to: 'api_test#clear_auth'
+  post 'api_test/create_test_data', to: 'api_test#create_test_data'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
