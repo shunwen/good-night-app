@@ -38,6 +38,12 @@ For simplicity:
 
 ## Performance Considerations
 
+### Implemented
+**Indexes**
+**Pagination**
+**Follow limits**
+**Response compression**
+
 ### Basics
 1. **Indexes**
     - Sleeps table: `user_id` and `started_at_utc` for user/date filtering
