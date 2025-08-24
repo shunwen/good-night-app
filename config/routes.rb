@@ -1,20 +1,20 @@
 Rails.application.routes.draw do
   namespace :users do
     resources :sleeps
-    resources :following_others, only: [:index, :create, :destroy]
-    
+    resources :following_others, only: [ :index, :create, :destroy ]
+
     namespace :following_others do
-      resources :prev_week_sleeps, only: [:index]
+      resources :prev_week_sleeps, only: [ :index ]
     end
   end
-  resources :users, only: [:index, :show, :new, :create, :destroy]
-  
-  get 'api_test', to: 'api_test#index'
-  post 'api_test/impersonate', to: 'api_test#impersonate'
-  delete 'api_test/clear_auth', to: 'api_test#clear_auth'
-  
+  resources :users, only: [ :index, :show, :new, :create, :destroy ]
+
+  get "api_test", to: "api_test#index"
+  post "api_test/impersonate", to: "api_test#impersonate"
+  delete "api_test/clear_auth", to: "api_test#clear_auth"
+
   namespace :api_test do
-    resources :test_data, only: [:create]
+    resources :test_data, only: [ :create ]
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

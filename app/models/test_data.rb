@@ -26,8 +26,8 @@ class TestData
     if follows_per_user > 0
       follows_params = user_ids.flat_map do |follower_id|
         # Calculate actual follow count (can't exceed available users)
-        actual_follows_count = [follows_per_user, user_count - 1].min
-        
+        actual_follows_count = [ follows_per_user, user_count - 1 ].min
+
         user_ids.excluding(follower_id).sample(actual_follows_count).map do |followed_id|
           {
             follower_id:,
@@ -43,7 +43,7 @@ class TestData
     # Prepare sleep records for all users based on sleeps_per_user parameter
     sleep_params = []
     if sleeps_per_user > 0
-      timezones = ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.strftime('%Z') }
+      timezones = ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.strftime("%Z") }
       sleep_params = user_ids.flat_map do |user_id|
         generate_sleep_records_for_user(user_id, timezones.sample, start_time + 2, sleeps_per_user)
       end
@@ -66,13 +66,13 @@ class TestData
     def self.generate_sleep_records_for_user(user_id, tz, created_at, sleeps_per_user)
       # Adjust available days based on number of sleep records to be created
       # Use more days than records needed to ensure variety and avoid conflicts
-      available_days_count = [sleeps_per_user * 1.5, 400].max
+      available_days_count = [ sleeps_per_user * 1.5, 400 ].max
       available_days = (1..available_days_count).to_a
       selected_days = available_days.sample(sleeps_per_user)
-      
+
       selected_days.map do |date_offset|
         date = Date.current.days_ago(date_offset)
-        start_hour = [21, 22, 23, 0, 1, 2].sample
+        start_hour = [ 21, 22, 23, 0, 1, 2 ].sample
         start_minute = rand(60)
         started = date.beginning_of_day + start_hour.hours + start_minute.minutes
         duration = rand(18000..36000).seconds

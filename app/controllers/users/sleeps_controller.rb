@@ -66,6 +66,6 @@ class Users::SleepsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def sleep_params
-      params.expect(sleep: [:started_at_raw, :stopped_at_raw])
+      params.expect(sleep: [ :started_at_raw, :stopped_at_raw ])
     end
 end

@@ -19,7 +19,7 @@ class Users::FollowingOthers::PrevWeekSleepsController < ApplicationController
     # Check if there are more records and trim to requested page size
     @has_next_page = sleeps_with_extra.size > per_page
     @sleeps = @has_next_page ? sleeps_with_extra[0, per_page] : sleeps_with_extra
-    
+
     # Pagination metadata for JBuilder
     @pagination = {
       current_page: page,

@@ -22,7 +22,7 @@ class ApiTestController < ApplicationController
       @following_count = 0
       @status = :cleared
     end
-    
+
     # Set a default user ID for the impersonate form
     @default_user_id = User.first&.id
   end
@@ -57,5 +57,4 @@ class ApiTestController < ApplicationController
       locals: { user: nil, user_id: nil, sleeps_count: 0, following_count: 0, status: :cleared }
     )
   end
-
 end

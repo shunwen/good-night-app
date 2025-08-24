@@ -1,7 +1,7 @@
 class Users::FollowingOthersController < ApplicationController
   def index
     @following_others = Current.user.following_others
-    
+
     respond_to do |format|
       format.html
       format.json { render json: @following_others }

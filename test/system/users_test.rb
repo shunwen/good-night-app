@@ -4,12 +4,12 @@ class UsersTest < ApplicationSystemTestCase
   setup do
     @user = users(:one)
     @user_two = users(:two)
-    visit '/'
+    visit "/"
 
     page.driver.browser.manage.add_cookie(
-      name: 'user_id',
+      name: "user_id",
       value: @user.id.to_s,
-      path: '/'
+      path: "/"
     )
   end
 

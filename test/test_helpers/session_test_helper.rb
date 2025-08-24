@@ -4,6 +4,6 @@ module SessionTestHelper
   end
 
   def sign_in(user)
-    cookies['user_id'] = user.id
+    cookies["user_id"] = user.id
   end
 end

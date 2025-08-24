@@ -11,11 +11,11 @@ class ApiTest::TestDataController < ApplicationController
     if user_count < 1 || user_count > 10000
       return render json: { error: "user_count must be between 1 and 10000" }, status: :bad_request
     end
-    
+
     if follows_per_user < 0 || follows_per_user > user_count
       return render json: { error: "follows_per_user must be between 0 and user_count" }, status: :bad_request
     end
-    
+
     if sleeps_per_user < 0 || sleeps_per_user > 1000
       return render json: { error: "sleeps_per_user must be between 0 and 1000" }, status: :bad_request
     end
@@ -29,7 +29,7 @@ class ApiTest::TestDataController < ApplicationController
     respond_to do |format|
       format.json do
         render json: {
-          status: 'completed',
+          status: "completed",
           users_created: result[:users_created],
           follows_created: result[:follows_created],
           sleep_records_created: result[:sleep_records_created],

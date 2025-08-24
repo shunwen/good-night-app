@@ -9,7 +9,7 @@ class SleepTest < ActiveSupport::TestCase
     )
 
     sleep.save!
-    
+
     assert_equal 8.hours, sleep.duration
   end
 
@@ -21,7 +21,7 @@ class SleepTest < ActiveSupport::TestCase
     )
 
     sleep.save!
-    
+
     assert_nil sleep.duration
   end
 
@@ -37,14 +37,14 @@ class SleepTest < ActiveSupport::TestCase
 
   test "should require started_at presence" do
     sleep = Sleep.new(user: users(:one))
-    
+
     assert_not sleep.valid?
     assert_includes sleep.errors[:started_at_raw], "can't be blank"
   end
 
   test "should belong to user" do
     sleep = Sleep.new(started_at_raw: "2025-01-01 22:00:00")
-    
+
     assert_not sleep.valid?
     assert_includes sleep.errors[:user], "must exist"
   end
