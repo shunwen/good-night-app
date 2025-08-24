@@ -39,10 +39,10 @@ For simplicity:
 ## Performance Considerations
 
 ### Implemented
-**Indexes**
-**Pagination**
-**Follow limits**
-**Response compression**
+- Indexes
+- Pagination
+- Follow limits
+- Response compression
 
 ### Basics
 1. **Indexes**
@@ -51,9 +51,14 @@ For simplicity:
 2. **Pagination** - More users means larger prev_week_sleeps responses. Paginate to reduce memory usage.
 3. **Follow limits** - Set upper limit per user (e.g. 5000 like X) to prevent excessive growth.
 4. **Counter caches** - APIs don't need counts currently. If added later, use counter caches for expensive COUNT queries.
-5. **Caching** - Cache prev_week_sleeps results per user for 5+ minutes, or implement cache invalidation based on follows' sleep updates.
+5. **Caching** - Cache prev_week_sleeps results per user for 5+ minutes, or 
+   implement cache invalidation based on follows' sleep updates. With 
+   pagination, cache can be tricky, so skipped.
 6. **Response compression**
-
+7. **Pregeneration** - After users update sleeps, enqueue background jobs to
+   pregenerate prev_week_sleeps data for followers. Read from the
+   pregenerated data.
+ 
 ### Advanced
 1. **Data Volume** - 1 sleep record ≈ 120 bytes. 100 years per user ≈ 4MB. Global scale (8B users) ≈ 32PB over 100 years.
 2. **Archival** - Archive old data to cheaper storage. Keep recent data hot, sync historical data to user devices.
@@ -62,6 +67,3 @@ For simplicity:
    twitter incident): need ~100 servers (assuming 250 req/s per Rails server). 
    Sleep creation at 1kB/req = 25MB/s, well below SSD write speeds (6-12GB/s).
 5. **Database Scaling** - Use read replicas for read traffic distribution, sharding for write traffic distribution when Ruby/database becomes the bottleneck.
-6. **Pregeneration** - After users update sleeps, enqueue background jobs to
-   pregenerate prev_week_sleeps data for followers. Read from the
-   pregenerated data.
