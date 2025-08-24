@@ -2,25 +2,15 @@
 
 <div class="container">
   <h1>API Test</h1>
-
-  <div class="section">
-    <h2>Auth</h2>
-    <div id="auth-status">
-      <%= render partial: "auth_status", locals: { user: @user, user_id: cookies[:user_id], sleeps_count: @sleeps_count, following_count: @following_count, status: @status } %>
-    </div>
-    <%= form_with url: api_test_impersonate_path, method: :post, local: false do |form| %>
-      <%= form.label :user_id, "User ID:" %>
-      <%= form.number_field :user_id, value: User.first&.id || 1, min: 1 %>
-      <%= form.submit "Impersonate" %>
-    <% end %>
-    <%= button_to "Clear", api_test_clear_auth_path, method: :delete, form: { local: false } %>
-  </div>
-
-  <div class="section">
-    <h2>Test History</h2>
-    <div id="test-history">
-      <p>No tests run yet</p>
-    </div>
+  
+  <div class="description">
+    <p>Welcome to the API testing interface! Follow these steps for best results:</p>
+    <ol>
+      <li><strong>Set up test data:</strong> Click "Setup Complete Test Data" below to create 1,000 users with follow relationships and 300,000 sleep records. <em><strong>Warning:</strong> This will clear all existing database data and replace it with fresh test data.</em></li>
+      <li><strong>Authenticate:</strong> Use the Auth section to impersonate one of the created users (try user ID 1-1000)</li>
+      <li><strong>Test endpoints:</strong> Use the endpoint testing interfaces to interact with the API</li>
+      <li><strong>Review history:</strong> Monitor your test results in the Test History section</li>
+    </ol>
   </div>
 
   <div class="section">
@@ -41,6 +31,26 @@
           <pre class="content"></pre>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Auth</h2>
+    <div id="auth-status">
+      <%= render partial: "auth_status", locals: { user: @user, user_id: cookies[:user_id], sleeps_count: @sleeps_count, following_count: @following_count, status: @status } %>
+    </div>
+    <%= form_with url: api_test_impersonate_path, method: :post, local: false do |form| %>
+      <%= form.label :user_id, "User ID:" %>
+      <%= form.number_field :user_id, value: @default_user_id, min: 1, placeholder: @default_user_id ? "User ID (e.g., #{@default_user_id})" : "User ID" %>
+      <%= form.submit "Impersonate" %>
+    <% end %>
+    <%= button_to "Clear", api_test_clear_auth_path, method: :delete, form: { local: false } %>
+  </div>
+
+  <div class="section">
+    <h2>Test History</h2>
+    <div id="test-history">
+      <p>No tests run yet</p>
     </div>
   </div>
 
@@ -1380,5 +1390,36 @@ form input[type="submit"], form input[type="submit"], button { padding: 4px 8px;
 .no-auth { 
   background-color: #74b9ff; 
   color: white; 
+}
+
+.description {
+  margin: 16px 0 24px 0;
+  padding: 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.description p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #495057;
+}
+
+.description ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.description li {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6c757d;
+}
+
+.description strong {
+  color: #343a40;
+  font-weight: 600;
 }
 </style>

@@ -22,6 +22,9 @@ class ApiTestController < ApplicationController
       @following_count = 0
       @status = :cleared
     end
+    
+    # Set a default user ID for the impersonate form
+    @default_user_id = User.first&.id
   end
 
   def impersonate

@@ -1,0 +1,36 @@
+<div class="user-card">
+  <div class="user-info">
+    <h3><%= user.name %></h3>
+    <p class="user-stats">
+      <%= pluralize(user.sleeps.count, 'sleep record') %>
+      <% if Current.user && user != Current.user %>
+        | 
+        <% if Current.user.following?(user) %>
+          <span class="following-status">Following</span>
+        <% else %>
+          <span class="not-following-status">Not following</span>
+        <% end %>
+      <% end %>
+    </p>
+  </div>
+  
+  <div class="actions">
+    <%= link_to "View Profile", user, class: "btn btn-primary" %>
+    
+    <% if Current.user && user != Current.user %>
+      <% if Current.user.following?(user) %>
+        <%= button_to "Unfollow", 
+            users_following_other_path(Current.user.followings.find_by(followed: user)), 
+            method: :delete, 
+            class: "btn btn-secondary",
+            confirm: "Are you sure you want to unfollow #{user.name}?" %>
+      <% else %>
+        <%= button_to "Follow", 
+            users_following_others_path, 
+            params: { followed_id: user.id }, 
+            method: :post,
+            class: "btn btn-success" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

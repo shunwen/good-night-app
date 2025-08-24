@@ -2,15 +2,26 @@
 
 <% content_for :title, "Users" %>
 
-<h1>Users</h1>
+<div class="container">
+  <h1>All Users</h1>
 
-<div id="users">
-  <% @users.each do |user| %>
-    <%= render user %>
-    <p>
-      <%= link_to "Show this user", user %>
-    </p>
+  <% if @users.any? %>
+    <div class="users-list">
+      <% @users.each do |user| %>
+        <%= render 'user_card', user: user %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h2>No users found</h2>
+      <p>Be the first to join the community!</p>
+      <%= link_to "Create User", new_user_path, class: "btn btn-primary" %>
+    </div>
   <% end %>
+
+  <div class="actions-footer">
+    <%= link_to "New user", new_user_path, class: "btn btn-primary" %>
+  </div>
 </div>
 
-<%= link_to "New user", new_user_path %>
+<%= render 'shared/user_card_styles' %>
