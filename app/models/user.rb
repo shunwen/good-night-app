@@ -20,15 +20,20 @@ class User < ApplicationRecord
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  # Follow limit to prevent excessive data growth (like X's 5000 limit)
+  FOLLOW_LIMIT = 5000
+
   def following?(user)
-    following_others.include?(user)
+    followings.exists?(followed_id: user.id)
   end
 
   def follow(user)
-    following_others << user unless self == user || following?(user)
+    unless self == user || following?(user) || followings.count >= FOLLOW_LIMIT
+      followings.create(followed: user)
+    end
   end
 
   def unfollow(user)
-    following_others.delete(user) if following?(user)
+    followings.find_by(followed_id: user.id)&.destroy
   end
 end
