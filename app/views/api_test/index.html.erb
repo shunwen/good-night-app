@@ -17,11 +17,9 @@
   </div>
 
   <div class="section">
-    <h2>Stats</h2>
-    <div class="stats">
-      <span>Requests: <strong id="total-requests">0</strong></span>
-      <span>Avg Time: <strong id="avg-response-time">0ms</strong></span>
-      <span>Success: <strong id="success-rate">0%</strong></span>
+    <h2>Test History</h2>
+    <div id="test-history">
+      <p>No tests run yet</p>
     </div>
   </div>
 
@@ -70,11 +68,7 @@
 </div>
 
 <script>
-let performanceStats = {
-  totalRequests: 0,
-  totalTime: 0,
-  successCount: 0
-};
+let testHistory = [];
 
 // Hotwire handles the impersonation now
 
@@ -94,14 +88,35 @@ function showTab(button, tabId) {
   button.classList.add('active');
 }
 
-function updatePerformanceStats() {
-  document.getElementById('total-requests').textContent = performanceStats.totalRequests;
-  const avgTime = performanceStats.totalRequests > 0 ? 
-    Math.round(performanceStats.totalTime / performanceStats.totalRequests) : 0;
-  document.getElementById('avg-response-time').textContent = avgTime + 'ms';
-  const successRate = performanceStats.totalRequests > 0 ? 
-    Math.round((performanceStats.successCount / performanceStats.totalRequests) * 100) : 0;
-  document.getElementById('success-rate').textContent = successRate + '%';
+function addToTestHistory(test) {
+  testHistory.unshift(test); // Add to beginning of array
+  if (testHistory.length > 20) {
+    testHistory = testHistory.slice(0, 20); // Keep only last 20 tests
+  }
+  updateTestHistoryDisplay();
+}
+
+function updateTestHistoryDisplay() {
+  const historyDiv = document.getElementById('test-history');
+  
+  if (testHistory.length === 0) {
+    historyDiv.innerHTML = '<p>No tests run yet</p>';
+    return;
+  }
+  
+  const historyHtml = testHistory.map(test => {
+    const statusClass = test.success ? 'success' : 'error';
+    const timeStr = new Date(test.timestamp).toLocaleTimeString();
+    return `<div class="test-item ${statusClass}">
+      <span class="test-time">${timeStr}</span>
+      <span class="test-method">${test.method}</span>
+      <span class="test-url">${test.url}</span>
+      <span class="test-status">${test.status}</span>
+      <span class="test-time-taken">${test.responseTime}ms</span>
+    </div>`;
+  }).join('');
+  
+  historyDiv.innerHTML = historyHtml;
 }
 
 async function testEndpoint(method, url, payload) {
@@ -173,13 +188,15 @@ X-CSRF-Token: ${document.querySelector('meta[name="csrf-token"]').getAttribute('
     
     responseContent.textContent = responseText;
     
-    // Update performance stats
-    performanceStats.totalRequests++;
-    performanceStats.totalTime += responseTime;
-    if (response.ok) {
-      performanceStats.successCount++;
-    }
-    updatePerformanceStats();
+    // Add to test history
+    addToTestHistory({
+      timestamp: Date.now(),
+      method: method,
+      url: url,
+      status: response.status,
+      responseTime: responseTime,
+      success: response.ok
+    });
     
     // Display summary
     summaryContent.innerHTML = `Status: ${response.status} ${response.statusText}
@@ -199,10 +216,15 @@ ${result}`;
     // Show error in raw response
     responseContent.textContent = `Error: ${error.message}`;
     
-    // Update performance stats
-    performanceStats.totalRequests++;
-    performanceStats.totalTime += responseTime;
-    updatePerformanceStats();
+    // Add error to test history
+    addToTestHistory({
+      timestamp: Date.now(),
+      method: method,
+      url: url,
+      status: 'Error',
+      responseTime: responseTime,
+      success: false
+    });
     
     // Display error summary
     summaryContent.innerHTML = `Error: ${error.message}
@@ -256,12 +278,15 @@ async function performanceTest(method, url, payload, iterations) {
         success: response.ok
       });
       
-      // Update global stats
-      performanceStats.totalRequests++;
-      performanceStats.totalTime += responseTime;
-      if (response.ok) {
-        performanceStats.successCount++;
-      }
+      // Add each test to history
+      addToTestHistory({
+        timestamp: Date.now(),
+        method: method,
+        url: url,
+        status: response.status,
+        responseTime: responseTime,
+        success: response.ok
+      });
       
     } catch (error) {
       const endTime = performance.now();
@@ -275,13 +300,19 @@ async function performanceTest(method, url, payload, iterations) {
         error: error.message
       });
       
-      performanceStats.totalRequests++;
-      performanceStats.totalTime += responseTime;
+      // Add error to history
+      addToTestHistory({
+        timestamp: Date.now(),
+        method: method,
+        url: url,
+        status: 'Error',
+        responseTime: responseTime,
+        success: false
+      });
     }
   }
   
   button.textContent = originalText;
-  updatePerformanceStats();
   
   // Calculate performance metrics
   const successfulResults = results.filter(r => r.success);
@@ -364,4 +395,13 @@ form input[type="submit"], form input[type="submit"], button { padding: 4px 8px;
 
 .user-details { margin-top: 4px; font-size: 11px; }
 .user-details p { margin: 2px 0; }
+
+.test-item { display: flex; gap: 12px; padding: 4px 8px; margin: 2px 0; border-radius: 2px; font-size: 11px; align-items: center; }
+.test-item.success { background: #f0f9f0; }
+.test-item.error { background: #fdf0f0; }
+.test-time { min-width: 60px; color: #666; }
+.test-method { min-width: 40px; font-weight: bold; font-family: monospace; }
+.test-url { flex-grow: 1; font-family: monospace; color: #666; }
+.test-status { min-width: 40px; font-weight: bold; }
+.test-time-taken { min-width: 50px; font-family: monospace; text-align: right; }
 </style>
