@@ -2,8 +2,18 @@
 
 <%= render @user %>
 
+<% if Current.user && Current.user != @user %>
+  <div>
+    <% if Current.user.following?(@user) %>
+      <% follow_relationship = Current.user.followings.find_by(followed: @user) %>
+      <%= button_to "Unfollow", users_following_other_path(follow_relationship), method: :delete, class: "btn btn-outline-primary" %>
+    <% else %>
+      <%= button_to "Follow", users_following_others_path, params: { followed_id: @user.id }, method: :post, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+<% end %>
+
 <div>
-  <%= link_to "Edit this user", edit_user_path(@user) %> |
   <%= link_to "Back to users", users_path %>
 
   <%= button_to "Destroy this user", @user, method: :delete %>

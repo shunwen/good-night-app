@@ -18,4 +18,8 @@ class User < ApplicationRecord
 
   validates_presence_of :name
   validates_uniqueness_of :name
+
+  def following?(user)
+    following_others.include?(user)
+  end
 end
