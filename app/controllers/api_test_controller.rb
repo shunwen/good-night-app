@@ -58,18 +58,4 @@ class ApiTestController < ApplicationController
     )
   end
 
-  def create_test_data
-    result = TestData.setup!
-
-    respond_to do |format|
-      format.json do
-        render json: {
-          status: 'completed',
-          users_created: result[:users_created],
-          sleep_records_created: result[:sleep_records_created],
-          total_time_seconds: result[:total_time_seconds]
-        }
-      end
-    end
-  end
 end

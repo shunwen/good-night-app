@@ -16,9 +16,21 @@
   <div class="section">
     <h2>Test Data Setup</h2>
     <div class="test-data-actions">
-      <button onclick="createBulkTestData()" class="bulk-create-btn">
-        Setup Complete Test Data (1k Users + Follows + 300k Sleeps)
-      </button>
+      <div class="test-data-form">
+        <div class="form-row">
+          <label for="user-count">Users:</label>
+          <input type="number" id="user-count" value="1000" min="1" max="10000">
+          
+          <label for="follows-per-user">Follows per user:</label>
+          <input type="number" id="follows-per-user" value="500" min="0" max="1000">
+          
+          <label for="sleeps-per-user">Sleeps per user:</label>
+          <input type="number" id="sleeps-per-user" value="300" min="0" max="1000">
+        </div>
+        <button onclick="createBulkTestData()" class="bulk-create-btn">
+          Setup Test Data
+        </button>
+      </div>
       <div id="bulk-create-result" class="result hidden">
         <div class="tabs">
           <button class="tab active" onclick="showTab(this, 'bulk-summary')">Summary</button>
@@ -663,6 +675,11 @@ async function createBulkTestData() {
   const originalText = button.textContent;
   const startTime = Date.now();
   
+  // Get parameters from form inputs
+  const userCount = parseInt(document.getElementById('user-count').value) || 1000;
+  const followsPerUser = parseInt(document.getElementById('follows-per-user').value) || 500;
+  const sleepsPerUser = parseInt(document.getElementById('sleeps-per-user').value) || 300;
+  
   // Show result container and switch to progress tab immediately
   const resultDiv = document.getElementById('bulk-create-result');
   resultDiv.classList.remove('hidden');
@@ -675,20 +692,33 @@ async function createBulkTestData() {
   try {
     button.textContent = 'Creating test data...';
     
-    // Show initial progress
-    progressContent.textContent = `Complete Test Data Setup
+    // Show initial progress with dynamic values
+    const totalSleepRecords = userCount * sleepsPerUser;
+    const totalFollowRelationships = userCount * followsPerUser;
+    
+    progressContent.textContent = `Configurable Test Data Setup
+
+Parameters:
+- Users: ${userCount.toLocaleString()}
+- Follows per user: ${followsPerUser.toLocaleString()}
+- Sleeps per user: ${sleepsPerUser.toLocaleString()}
 
 Clearing existing data (users, follows, sleeps)...
-Creating 1000 users + follow relationships + 300k sleep records
+Creating ${userCount.toLocaleString()} users + ${totalFollowRelationships.toLocaleString()} follow relationships + ${totalSleepRecords.toLocaleString()} sleep records
 
 Status: PROCESSING...`;
     
-    const response = await fetch('/api_test/create_test_data', {
+    const response = await fetch('/api_test/test_data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        user_count: userCount,
+        follows_per_user: followsPerUser,
+        sleeps_per_user: sleepsPerUser
+      })
     });
     
     const endTime = Date.now();
@@ -708,23 +738,30 @@ Status: COMPLETED ✓
 
 Created with unique user names and random sleep data across timezones.`;
       
-      // Update summary
-      summaryContent.innerHTML = `Complete Test Data Setup Finished:
+      // Update summary with dynamic values
+      const followsPerUserActual = data.follows_created > 0 ? Math.round(data.follows_created / data.users_created) : 0;
+      
+      summaryContent.innerHTML = `Configurable Test Data Setup Finished:
 
-Users Created: ${data.users_created}
-Sleep Records Created: ${data.sleep_records_created} (${Math.round(data.sleep_records_created / data.users_created)} per user)
-Follow Relationships: Each user follows ~${Math.round(data.users_created / 2)} others
+Users Created: ${data.users_created.toLocaleString()}
+Sleep Records Created: ${data.sleep_records_created.toLocaleString()} (${Math.round(data.sleep_records_created / data.users_created)} per user)
+Follow Relationships: ${data.follows_created.toLocaleString()} total (${followsPerUserActual} per user)
+
+Parameters Used:
+- Users: ${data.parameters.user_count.toLocaleString()}
+- Follows per user: ${data.parameters.follows_per_user.toLocaleString()}
+- Sleeps per user: ${data.parameters.sleeps_per_user.toLocaleString()}
 
 Server Processing Time: ${data.total_time_seconds}s
 Client Request Time: ${totalTime.toFixed(2)}s
 
-✨ Complete Database Setup:
+✨ Configurable Database Setup:
 - Cleared all existing data (users, follows, sleeps)
 - Unique user names using SecureRandom
-- Random follow relationships between users
+- Configurable follow relationships between users
 - Random sleep times across multiple timezones  
 - Sleep durations between 5-10 hours
-- Historical data spread over past 400 days
+- Historical data spread over past ${Math.round(data.parameters.sleeps_per_user * 1.5)} days
 - Database bulk inserts for optimal performance`;
       
       resultDiv.classList.remove('success', 'warning', 'error');
@@ -1421,5 +1458,47 @@ form input[type="submit"], form input[type="submit"], button { padding: 4px 8px;
 .description strong {
   color: #343a40;
   font-weight: 600;
+}
+
+.test-data-form {
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.form-row label {
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.form-row input[type="number"] {
+  padding: 6px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  width: 100px;
+}
+
+.bulk-create-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bulk-create-btn:hover {
+  background: #0056b3;
+  border-color: #0056b3;
 }
 </style>
