@@ -1,0 +1,61 @@
+<%
+  endpoint = {
+    name: "Users::Followings#destroy",
+    method: "DELETE",
+    url: "/users/followings",
+    description: "Unfollow a user",
+    sample_payload: { followed_id: 2 },
+    auth_required: true
+  }
+  index = 3
+%>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method"><%= endpoint[:method] %></span>
+    <span class="url"><%= endpoint[:url] %></span>
+    <span class="desc"><%= endpoint[:description] %></span>
+    <% if endpoint[:auth_required] %>
+      <span class="auth-required">Auth Required</span>
+    <% else %>
+      <span class="no-auth">No Auth</span>
+    <% end %>
+  </div>
+  
+  <% if endpoint[:sample_payload] %>
+    <details class="payload">
+      <summary>Payload</summary>
+      <pre><%= JSON.pretty_generate(endpoint[:sample_payload]) %></pre>
+    </details>
+  <% end %>
+  
+  <div class="actions">
+    <form onsubmit="return false;" style="margin: 0;">
+      <label>Unfollow User ID:</label>
+      <input type="number" id="unfollow-user-id-<%= index %>" value="<%= endpoint[:sample_payload][:followed_id] %>" min="1" style="width: 60px;">
+      <button onclick="testFollowEndpoint('<%= endpoint[:method] %>', '<%= endpoint[:url] %>', <%= index %>)">
+        Test
+      </button>
+      <button onclick="performanceFollowTest('<%= endpoint[:method] %>', '<%= endpoint[:url] %>', <%= index %>, 10)">
+        Perf (10x)
+      </button>
+    </form>
+  </div>
+  
+  <div id="result-<%= index %>" class="result hidden">
+    <div class="tabs">
+      <button class="tab active" onclick="showTab(this, 'summary-<%= index %>')">Summary</button>
+      <button class="tab" onclick="showTab(this, 'request-<%= index %>')">Request</button>
+      <button class="tab" onclick="showTab(this, 'response-<%= index %>')">Response</button>
+    </div>
+    <div id="summary-<%= index %>" class="tab-content active">
+      <pre class="content"></pre>
+    </div>
+    <div id="request-<%= index %>" class="tab-content">
+      <pre class="content"></pre>
+    </div>
+    <div id="response-<%= index %>" class="tab-content">
+      <pre class="content"></pre>
+    </div>
+  </div>
+</div>

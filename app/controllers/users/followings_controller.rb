@@ -1,4 +1,13 @@
 class Users::FollowingsController < ApplicationController
+  def index
+    @followings = Current.user.following_others.includes(:sleeps)
+    
+    respond_to do |format|
+      format.html
+      format.json { render json: @followings }
+    end
+  end
+
   def create
     @user = User.find(params[:followed_id])
     @follow = Current.user.followings.build(followed: @user)
