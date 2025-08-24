@@ -7,7 +7,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get index when authenticated" do
-    cookies[:user_id] = @user.id
+    sign_in @user
     get users_url
     assert_response :success
   end
@@ -18,6 +18,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create user" do
+    sign_in @user
+
     assert_difference("User.count") do
       post users_url, params: { user: { name: "Charlie" } }
     end
@@ -26,7 +28,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show user when authenticated" do
-    cookies[:user_id] = @user.id
+    sign_in @user
+
     get user_url(@other_user)
     assert_response :success
   end
@@ -37,7 +40,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy user when authenticated" do
-    cookies[:user_id] = @user.id
+    sign_in @user
+
     assert_difference("User.count", -1) do
       delete user_url(@user)
     end
@@ -49,7 +53,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference("User.count") do
       delete user_url(@user)
     end
-    
+
     assert_response :unauthorized
   end
 end
