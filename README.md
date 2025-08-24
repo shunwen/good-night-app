@@ -43,7 +43,7 @@ For simplicity:
 - Indexes
 - Pagination
 - Follow limits
-- Response compression
+- Response compression, for demo purpose enable in development
 
 ### Basics
 1. **Indexes**
