@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :follows
 
   namespace :users do
+    resources :sleeps
     post :followings, to: "followings#create"
     delete :followings, to: "followings#destroy"
   end

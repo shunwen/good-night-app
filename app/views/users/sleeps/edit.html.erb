@@ -1,0 +1,12 @@
+<% content_for :title, "Editing sleep" %>
+
+<h1>Editing sleep</h1>
+
+<%= render "form", sleep: @sleep %>
+
+<br>
+
+<div>
+  <%= link_to "Show this sleep", users_sleep_path(@sleep) %> |
+  <%= link_to "Back to sleeps", users_sleeps_path %>
+</div>

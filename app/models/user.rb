@@ -14,6 +14,8 @@ class User < ApplicationRecord
            through: :followings,
            source: :followed
 
+  has_many :sleeps, dependent: :destroy
+
   validates_presence_of :name
   validates_uniqueness_of :name
 end

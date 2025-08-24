@@ -1,0 +1,24 @@
+<div id="<%= dom_id sleep %>">
+  <p>
+    <strong>User:</strong>
+    <%= sleep.user.name %>
+  </p>
+
+  <p>
+    <strong>Started at:</strong>
+    <%= sleep.started_at_raw %>
+  </p>
+
+  <% if sleep.stopped_at_raw %>
+    <p>
+      <strong>Stopped at:</strong>
+      <%= sleep.stopped_at_raw %>
+    </p>
+
+    <p>
+      <strong>Duration:</strong>
+      <%= pluralize((sleep.duration / 3600).round(1), "hour") %>
+    </p>
+  <% end %>
+
+</div>

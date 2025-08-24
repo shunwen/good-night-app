@@ -1,0 +1,1 @@
+json.array! @sleeps, partial: "users/sleeps/sleep", as: :sleep

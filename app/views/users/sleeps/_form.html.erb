@@ -1,0 +1,27 @@
+<%= form_with(model: [:users, sleep]) do |form| %>
+  <% if sleep.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(sleep.errors.count, "error") %> prohibited this sleep from being saved:</h2>
+
+      <ul>
+        <% sleep.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :started_at_raw, "Started at", style: "display: block" %>
+    <%= form.text_field :started_at_raw, placeholder: "YYYY-MM-DD HH:MM:SS TZ" %>
+  </div>
+
+  <div>
+    <%= form.label :stopped_at_raw, "Stopped at", style: "display: block" %>
+    <%= form.text_field :stopped_at_raw, placeholder: "YYYY-MM-DD HH:MM:SS TZ" %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

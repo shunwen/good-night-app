@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  started_at_raw: <%= DateTime.parse("2025-08-23 21:00").in_time_zone('Hawaii').strftime("%F %R %Z") %>
+  started_at_utc: <%= DateTime.parse("2025-08-23 21:00").in_time_zone('Hawaii').utc %>
+  stopped_at_raw: <%= (DateTime.parse("2025-08-23 21:00")+ 6.hours).in_time_zone('Hawaii').strftime("%F %R %Z") %>
+  duration: <%= 6.hours %>
+  user: one
+
+two:
+  started_at_raw: 2025-08-23 20:00:00
+  started_at_utc: <%= DateTime.parse("2025-08-23 20:00:00").utc %>
+  user: two
