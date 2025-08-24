@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  resources :follows
-
   namespace :users do
     resources :sleeps
     resources :following_others, only: [:index, :create, :destroy]
