@@ -1,0 +1,25 @@
+<% case status %>
+<% when :success %>
+  <div class="auth-status success">
+    <p><strong>Impersonating User #<%= user_id %></strong></p>
+    <div class="user-details">
+      <p><strong>Name:</strong> <%= user.name %></p>
+      <p><strong>Sleep Records:</strong> <%= sleeps_count %></p>
+      <p><strong>Following:</strong> <%= following_count %> users</p>
+      <p><strong>Created:</strong> <%= user.created_at.strftime("%B %d, %Y") %></p>
+    </div>
+  </div>
+<% when :not_found %>
+  <div class="auth-status warning">
+    <p><strong>Impersonating User #<%= user_id %></strong></p>
+    <p><em>User not found</em></p>
+  </div>
+<% when :cleared %>
+  <div class="auth-status">
+    <p>Not authenticated</p>
+  </div>
+<% else %>
+  <div class="auth-status">
+    <p>Not authenticated</p>
+  </div>
+<% end %>
