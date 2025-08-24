@@ -21,7 +21,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     # Create a sleep record from previous week for user_two
     prev_week_sleep = @user_two.sleeps.create!(
       started_at_raw: Time.current.prev_week.beginning_of_week.strftime("%Y-%m-%d 22:00:00"),
-      stopped_at_raw: Time.current.prev_week.beginning_of_week.strftime("%Y-%m-%d 06:00:00")
+      stopped_at_raw: Time.current.tomorrow.prev_week.beginning_of_week.strftime("%Y-%m-%d 06:00:00")
     )
 
     get users_following_others_prev_week_sleeps_url
@@ -74,13 +74,13 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     # Sleep from this week (should be excluded)
     this_week_sleep = @user_two.sleeps.create!(
       started_at_raw: Time.current.beginning_of_week.strftime("%Y-%m-%d 22:00:00"),
-      stopped_at_raw: Time.current.beginning_of_week.strftime("%Y-%m-%d 06:00:00")
+      stopped_at_raw: Time.current.tomorrow.beginning_of_week.strftime("%Y-%m-%d 06:00:00")
     )
 
     # Sleep from two weeks ago (should be excluded)
     two_weeks_ago_sleep = @user_two.sleeps.create!(
       started_at_raw: (Time.current - 2.weeks).strftime("%Y-%m-%d 22:00:00"),
-      stopped_at_raw: (Time.current - 2.weeks).strftime("%Y-%m-%d 06:00:00")
+      stopped_at_raw: (Time.current.tomorrow - 2.weeks).strftime("%Y-%m-%d 06:00:00")
     )
 
     get users_following_others_prev_week_sleeps_url, as: :json

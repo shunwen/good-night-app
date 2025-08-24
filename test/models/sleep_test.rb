@@ -48,4 +48,15 @@ class SleepTest < ActiveSupport::TestCase
     assert_not sleep.valid?
     assert_includes sleep.errors[:user], "must exist"
   end
+
+  test "should validate stopped_at_raw is after started_at_raw" do
+    sleep = Sleep.new(
+      user: users(:one),
+      started_at_raw: "2025-01-01 22:00:00",
+      stopped_at_raw: "2025-01-01 20:00:00"
+    )
+
+    assert_not sleep.valid?
+    assert_includes sleep.errors[:stopped_at_raw], "must be after started_at_raw"
+  end
 end
