@@ -2,15 +2,6 @@ class ApiTestController < ApplicationController
   allow_unauthenticated_access
   
   def index
-    @endpoints = [
-      {
-        name: "Users#create",
-        method: "POST",
-        url: "/users",
-        description: "Create a new user",
-        sample_payload: { user: { name: "Test User" } }
-      }
-    ]
   end
 
   def impersonate
