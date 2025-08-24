@@ -6,8 +6,8 @@
     description: "Create a sleep record for current user",
     sample_payload: { 
       sleep: { 
-        started_at_raw: "2025-01-01 22:00:00 PST",
-        stopped_at_raw: "2025-01-02 06:00:00 PST"
+        started_at_raw: "2024-12-15 22:30:00 PST",
+        stopped_at_raw: "2024-12-16 06:45:00 PST"
       } 
     },
     requires_auth: true
@@ -34,10 +34,10 @@
   
   <div class="actions">
     <button onclick="testEndpoint('<%= endpoint[:method] %>', '<%= endpoint[:url] %>', <%= endpoint[:sample_payload]&.to_json || 'null' %>)">
-      Test
+      Create Sleep Record
     </button>
-    <button onclick="performanceTest('<%= endpoint[:method] %>', '<%= endpoint[:url] %>', <%= endpoint[:sample_payload]&.to_json || 'null' %>, 10)">
-      Perf (10x)
+    <button onclick="createTestData('<%= endpoint[:method] %>', '<%= endpoint[:url] %>', <%= endpoint[:sample_payload]&.to_json || 'null' %>, 300)">
+      Generate 300 Records
     </button>
   </div>
   

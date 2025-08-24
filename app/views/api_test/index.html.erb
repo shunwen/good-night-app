@@ -98,15 +98,48 @@ async function testEndpoint(method, url, payload) {
     };
     
     if (payload && (method === 'POST' || method === 'PATCH')) {
+      const testPayload = JSON.parse(JSON.stringify(payload)); // Deep copy
+      
       // Generate unique user name for create operations
-      if (payload.user && payload.user.name) {
-        const testPayload = JSON.parse(JSON.stringify(payload)); // Deep copy
+      if (testPayload.user && testPayload.user.name) {
         const randomSuffix = Math.random().toString(36).substring(2, 8);
         testPayload.user.name = `Test User ${randomSuffix}`; // Always use base name
-        options.body = JSON.stringify(testPayload);
-      } else {
-        options.body = JSON.stringify(payload);
       }
+      
+      // Generate random date within past year for sleep records
+      if (testPayload.sleep && testPayload.sleep.started_at_raw) {
+        const daysAgo = Math.floor(Math.random() * 365); // Random day in past year
+        const randomDate = new Date();
+        randomDate.setDate(randomDate.getDate() - daysAgo);
+        
+        // Random sleep start time between 9 PM and 1 AM
+        const startHour = 21 + Math.floor(Math.random() * 4); // 21, 22, 23, or 0 (midnight)
+        const startMinute = Math.floor(Math.random() * 60);
+        
+        const startDate = new Date(randomDate);
+        startDate.setHours(startHour, startMinute, 0, 0);
+        
+        // Sleep duration between 6-10 hours
+        const sleepDurationHours = 6 + Math.floor(Math.random() * 4);
+        const sleepDurationMinutes = Math.floor(Math.random() * 60);
+        
+        const endDate = new Date(startDate);
+        endDate.setHours(endDate.getHours() + sleepDurationHours, endDate.getMinutes() + sleepDurationMinutes);
+        
+        // Format dates as strings
+        const formatDate = (date) => {
+          return date.getFullYear() + '-' + 
+                 String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                 String(date.getDate()).padStart(2, '0') + ' ' +
+                 String(date.getHours()).padStart(2, '0') + ':' +
+                 String(date.getMinutes()).padStart(2, '0') + ':00 PST';
+        };
+        
+        testPayload.sleep.started_at_raw = formatDate(startDate);
+        testPayload.sleep.stopped_at_raw = formatDate(endDate);
+      }
+      
+      options.body = JSON.stringify(testPayload);
     }
     
     // Show raw request
@@ -293,6 +326,129 @@ Max Response Time: ${maxResponseTime}ms
 
 Individual Results:
 ${results.map(r => `#${r.iteration}: ${r.status} - ${r.responseTime}ms${r.error ? ` (${r.error})` : ''}`).join('\n')}`;
+  
+  resultDiv.classList.remove('hidden');
+  resultDiv.classList.remove('success', 'warning', 'error');
+  resultDiv.classList.add(successRate > 90 ? 'success' : 'warning');
+}
+
+async function createTestData(method, url, payload, count) {
+  const results = [];
+  const button = document.querySelector(`button[onclick*="createTestData"][onclick*="${method}"][onclick*="${url}"]`);
+  const originalText = button.textContent;
+  
+  for (let i = 0; i < count; i++) {
+    button.textContent = `Creating... (${i + 1}/${count})`;
+    const startTime = performance.now();
+    
+    try {
+      const options = {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      };
+      
+      if (payload && (method === 'POST' || method === 'PATCH')) {
+        const testPayload = JSON.parse(JSON.stringify(payload)); // Deep copy
+        
+        // Generate random date within past year for sleep records
+        if (testPayload.sleep && testPayload.sleep.started_at_raw) {
+          const daysAgo = Math.floor(Math.random() * 365); // Random day in past year
+          const randomDate = new Date();
+          randomDate.setDate(randomDate.getDate() - daysAgo);
+          
+          // Random sleep start time between 9 PM and 1 AM
+          const startHour = 21 + Math.floor(Math.random() * 4); // 21, 22, 23, or 0 (midnight)
+          const startMinute = Math.floor(Math.random() * 60);
+          
+          const startDate = new Date(randomDate);
+          startDate.setHours(startHour, startMinute, 0, 0);
+          
+          // Sleep duration between 6-10 hours
+          const sleepDurationHours = 6 + Math.floor(Math.random() * 4);
+          const sleepDurationMinutes = Math.floor(Math.random() * 60);
+          
+          const endDate = new Date(startDate);
+          endDate.setHours(endDate.getHours() + sleepDurationHours, endDate.getMinutes() + sleepDurationMinutes);
+          
+          // Format dates as strings
+          const formatDate = (date) => {
+            return date.getFullYear() + '-' + 
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(date.getDate()).padStart(2, '0') + ' ' +
+                   String(date.getHours()).padStart(2, '0') + ':' +
+                   String(date.getMinutes()).padStart(2, '0') + ':00 PST';
+          };
+          
+          testPayload.sleep.started_at_raw = formatDate(startDate);
+          testPayload.sleep.stopped_at_raw = formatDate(endDate);
+        }
+        
+        options.body = JSON.stringify(testPayload);
+      }
+      
+      const response = await fetch(url, options);
+      const endTime = performance.now();
+      const responseTime = Math.round(endTime - startTime);
+      
+      results.push({
+        iteration: i + 1,
+        status: response.status,
+        responseTime: responseTime,
+        success: response.ok
+      });
+      
+      // Add each test to history (but only every 10th to avoid flooding)
+      if (i % 10 === 0 || i === count - 1) {
+        addToTestHistory({
+          timestamp: Date.now(),
+          method: method,
+          url: url,
+          status: response.status,
+          responseTime: responseTime,
+          success: response.ok
+        });
+      }
+      
+    } catch (error) {
+      const endTime = performance.now();
+      const responseTime = Math.round(endTime - startTime);
+      
+      results.push({
+        iteration: i + 1,
+        status: 'Error',
+        responseTime: responseTime,
+        success: false,
+        error: error.message
+      });
+    }
+  }
+  
+  button.textContent = originalText;
+  
+  // Calculate summary metrics
+  const successfulResults = results.filter(r => r.success);
+  const avgResponseTime = results.reduce((sum, r) => sum + r.responseTime, 0) / results.length;
+  const successRate = (successfulResults.length / results.length) * 100;
+  
+  // Display test data creation results
+  const resultDiv = button.closest('.endpoint').querySelector('.result');
+  const resultContent = resultDiv.querySelector('#summary-' + resultDiv.id.split('-')[1] + ' .content');
+  
+  resultContent.innerHTML = `Test Data Generation Complete (${count} records):
+
+Success Rate: ${successRate.toFixed(1)}%
+Average Response Time: ${Math.round(avgResponseTime)}ms
+Records Created: ${successfulResults.length}
+Failed: ${results.length - successfulResults.length}
+
+Generated sleep records spanning the past year with random:
+- Sleep start times (9 PM - 1 AM)
+- Sleep durations (6-10 hours)
+- Dates throughout the past 365 days`;
   
   resultDiv.classList.remove('hidden');
   resultDiv.classList.remove('success', 'warning', 'error');
