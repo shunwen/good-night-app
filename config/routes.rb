@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   resources :users, only: [ :index, :show, :new, :create, :destroy ]
 
   get "api_test", to: "api_test#index"
-  post "api_test/impersonate", to: "api_test#impersonate"
-  delete "api_test/clear_auth", to: "api_test#clear_auth"
+  
+  resource :session, only: [:new, :create, :destroy]
 
   namespace :api_test do
     resources :test_data, only: [ :create ]

@@ -4,13 +4,7 @@ class UsersTest < ApplicationSystemTestCase
   setup do
     @user = users(:one)
     @user_two = users(:two)
-    visit "/"
-
-    page.driver.browser.manage.add_cookie(
-      name: "user_id",
-      value: @user.id.to_s,
-      path: "/"
-    )
+    sign_in(@user)
   end
 
   test "visiting the index" do

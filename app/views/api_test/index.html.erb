@@ -51,12 +51,12 @@
     <div id="auth-status">
       <%= render partial: "auth_status", locals: { user: @user, user_id: cookies[:user_id], sleeps_count: @sleeps_count, following_count: @following_count, status: @status } %>
     </div>
-    <%= form_with url: api_test_impersonate_path, method: :post, local: false do |form| %>
-      <%= form.label :user_id, "User ID:" %>
-      <%= form.number_field :user_id, value: @default_user_id, min: 1, placeholder: @default_user_id ? "User ID (e.g., #{@default_user_id})" : "User ID" %>
-      <%= form.submit "Impersonate" %>
-    <% end %>
-    <%= button_to "Clear", api_test_clear_auth_path, method: :delete, form: { local: false } %>
+    <form id="session-form">
+      <label for="user_id">User ID:</label>
+      <input type="number" id="user_id" name="user_id" value="<%= @default_user_id %>" min="1" placeholder="<%= @default_user_id ? "User ID (e.g., #{@default_user_id})" : "User ID" %>">
+      <button type="submit">Sign In</button>
+    </form>
+    <button id="sign-out-btn">Sign Out</button>
   </div>
 
   <div class="section">
@@ -72,7 +72,114 @@
 <script>
 let testHistory = [];
 
-// Hotwire handles the impersonation now
+// Handle session authentication
+document.addEventListener('DOMContentLoaded', function() {
+  const sessionForm = document.getElementById('session-form');
+  const signOutBtn = document.getElementById('sign-out-btn');
+  
+  // Check if already signed in when page loads
+  updateAuthStatus();
+  
+  sessionForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const userId = document.getElementById('user_id').value;
+    
+    try {
+      const response = await fetch('/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ user_id: userId })
+      });
+      
+      if (response.ok) {
+        // Fetch user details via users#show
+        await updateAuthStatus();
+      } else {
+        showAuthStatus('not_found', null, userId);
+      }
+    } catch (error) {
+      showAuthStatus('error', null, userId);
+    }
+  });
+  
+  signOutBtn.addEventListener('click', async function() {
+    try {
+      const response = await fetch('/session', {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        showAuthStatus('cleared', null, null);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  });
+});
+
+async function updateAuthStatus() {
+  try {
+    const response = await fetch('/users/current.json');
+    if (response.ok) {
+      const userData = await response.json();
+      showAuthStatus('success', userData, userData.id);
+    } else {
+      showAuthStatus('cleared', null, null);
+    }
+  } catch (error) {
+    showAuthStatus('cleared', null, null);
+  }
+}
+
+function showAuthStatus(status, user, userId) {
+  const authStatusDiv = document.getElementById('auth-status');
+  let html = '';
+  
+  switch (status) {
+    case 'success':
+      html = `
+        <div class="auth-status success">
+          <p><strong>Signed in as User #${userId}</strong></p>
+          <div class="user-details">
+            <p><strong>Name:</strong> ${user.name}</p>
+            <p><strong>Sleep Records:</strong> ${user.sleeps_count || 0}</p>
+            <p><strong>Following:</strong> ${user.following_count || 0} users</p>
+            <p><strong>Followers:</strong> ${user.followers_count || 0} users</p>
+            <p><strong>Created:</strong> ${new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+        </div>`;
+      break;
+    case 'not_found':
+      html = `
+        <div class="auth-status warning">
+          <p><strong>User #${userId}</strong></p>
+          <p><em>User not found</em></p>
+        </div>`;
+      break;
+    case 'error':
+      html = `
+        <div class="auth-status warning">
+          <p><strong>Error signing in</strong></p>
+          <p><em>Please try again</em></p>
+        </div>`;
+      break;
+    case 'cleared':
+    default:
+      html = `
+        <div class="auth-status">
+          <p>Not authenticated</p>
+        </div>`;
+      break;
+  }
+  
+  authStatusDiv.innerHTML = html;
+}
 
 function showTab(button, tabId) {
   // Get the parent result container

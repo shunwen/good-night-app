@@ -14,7 +14,7 @@ module Authentication
   private
 
     def require_authentication
-      Current.user = User.find_by(id: cookies[:user_id])
+      Current.user = User.find_by(id: cookies.signed[:user_id].to_i)
       head :unauthorized unless Current.user
     end
 end

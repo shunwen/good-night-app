@@ -3,7 +3,7 @@ require "test_helper"
 class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @sleep = sleeps(:one)
-    cookies[:user_id] = @sleep.user_id
+    sign_in @sleep.user
   end
 
   test "should get index" do

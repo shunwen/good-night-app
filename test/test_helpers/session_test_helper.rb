@@ -4,6 +4,7 @@ module SessionTestHelper
   end
 
   def sign_in(user)
-    cookies["user_id"] = user.id
+    # Use the sessions controller to properly sign in during tests
+    post session_path, params: { user_id: user.id }, as: :json
   end
 end
