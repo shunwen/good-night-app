@@ -2,17 +2,22 @@
 
 ## API Test Page
 
-Clone repo, add master.key, set up database, start Rails server, then test 
-APIs at 
-https://localhost:3000/api_test (created with Claude Code,
+- Clone repo
+- Add master.key `rails secret > config/master.key`
+- Set up database `rails db:setup`
+- Start Rails server `rails server`
+- Test APIs at https://localhost:3000/api_test (created with Claude Code,
 not all APIs are supported here).
 
 ## Assumptions
 
 For simplicity:
 
-- No user registration or login features. Create users through the API test page or Rails console: `user = User.create!(name: "your_name")`.
-- Authentication uses cookie-based sessions. Set `user_id=your_user_id` via the API test page or browser console: `document.cookie = "user_id=your_user_id"`. Same mechanism works for both HTML and JSON API requests.
+- No user registration features. Create users through the API test page 
+  or Rails console: `user = User.create!(name: "your_name")`.
+- Casual authentication uses cookie-based sessions. It's still signed, use 
+  `POST /session` with payload `{user_id: "your user id"}` to get the signed cookie. 
+  Use `DELETE /session` to sign out.
 - Users have only two attributes: `id` and `name`.
 - HTML views from scaffolding remain for easier manual testing.
 
