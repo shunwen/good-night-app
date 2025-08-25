@@ -10,15 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 1) do
-  create_table "solid_cache_entries", force: :cascade do |t|
-    t.binary "key", limit: 1024, null: false
-    t.binary "value", limit: 536870912, null: false
+ActiveRecord::Schema[8.0].define(version: 2025_08_25_151343) do
+  create_table "sleeps", force: :cascade do |t|
+    t.string "started_at_raw", null: false
+    t.datetime "started_at_utc", null: false
+    t.string "stopped_at_raw"
+    t.integer "duration"
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
-    t.integer "key_hash", limit: 8, null: false
-    t.integer "byte_size", limit: 4, null: false
-    t.index ["byte_size"], name: "index_solid_cache_entries_on_byte_size"
-    t.index ["key_hash", "byte_size"], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
-    t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
+    t.datetime "updated_at", null: false
+    t.index ["id"], name: "index_sleeps_on_id"
+    t.index ["started_at_utc", "duration"], name: "index_sleeps_on_started_at_utc_and_duration"
+    t.index ["user_id", "started_at_utc", "duration"], name: "index_sleeps_on_user_id_and_started_at_utc_and_duration"
   end
 end
