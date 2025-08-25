@@ -1,0 +1,63 @@
+<% content_for :title, "Sign In" %>
+
+<div class="container">
+  <h1>Sign In</h1>
+  
+  <%= form_with url: session_path, method: :post, local: true do |form| %>
+    <div class="form-group">
+      <%= form.label :user_id, "User ID:" %>
+      <%= form.number_field :user_id, min: 1, placeholder: "Enter user ID" %>
+    </div>
+    
+    <div class="form-actions">
+      <%= form.submit "Sign In", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<style>
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+</style>
