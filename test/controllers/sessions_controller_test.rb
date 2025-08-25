@@ -7,7 +7,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create session with valid user_id" do
     post session_path, params: { user_id: @user.id }, as: :json
-    
+
     assert_response :created
     # Check that user_id cookie was set (we can't easily test signed cookies in integration tests)
     assert cookies["user_id"]
@@ -15,14 +15,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "should return unauthorized with invalid user_id" do
     post session_path, params: { user_id: 99999 }, as: :json
-    
+
     assert_response :unauthorized
     assert_nil cookies["user_id"]
   end
 
   test "should return unauthorized with missing user_id" do
     post session_path, params: {}, as: :json
-    
+
     assert_response :unauthorized
     assert_nil cookies["user_id"]
   end
@@ -54,7 +54,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     # Test that we can access /users/current (which requires authentication)
     get "/users/current", as: :json
     assert_response :success
-    
+
     json_response = JSON.parse(response.body)
     assert_equal @user.id, json_response["id"]
     assert_equal @user.name, json_response["name"]

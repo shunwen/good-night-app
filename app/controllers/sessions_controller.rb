@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
   def create
     if @user = User.find_by(id: params[:user_id])
       cookies.signed.permanent[:user_id] = { value: @user.id.to_s }
-      
+
       respond_to do |format|
         format.json { head :created }
         format.html { redirect_to root_path, notice: "Signed in successfully" }
@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
 
   def destroy
     cookies.delete(:user_id)
-    
+
     respond_to do |format|
       format.json { head :ok }
       format.html { redirect_to root_path, notice: "Signed out successfully" }

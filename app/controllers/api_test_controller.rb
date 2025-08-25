@@ -26,5 +26,4 @@ class ApiTestController < ApplicationController
     # Set a default user ID for the impersonate form
     @default_user_id = User.first&.id
   end
-
 end

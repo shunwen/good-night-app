@@ -20,8 +20,8 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
 
     # Create a sleep record from previous week for user_two
     prev_week_sleep = @user_two.sleeps.create!(
-      started_at_raw: Time.current.prev_week.beginning_of_week.strftime("%Y-%m-%d 22:00:00"),
-      stopped_at_raw: (Time.current.prev_week.beginning_of_week + 1.day).strftime("%Y-%m-%d 06:00:00")
+      started_at_raw: Time.current.prev_week.strftime("%Y-%m-%d 22:00:00"),
+      stopped_at_raw: (Time.current.prev_week + 1.day).strftime("%Y-%m-%d 06:00:00")
     )
 
     get users_following_others_prev_week_sleeps_url
@@ -63,7 +63,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   test "should only show sleep records from previous week" do
     @user_one.following_others << @user_two
 
-    prev_week_start = Time.current.prev_week.beginning_of_week
+    prev_week_start = Time.current.prev_week
 
     # Sleep from previous week (should be included)
     prev_week_sleep = @user_two.sleeps.create!(
@@ -100,7 +100,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
     @user_one.following_others << @user_two
 
     # Create sleep records from previous week with different durations
-    prev_week_start = Time.current.prev_week.beginning_of_week
+    prev_week_start = Time.current.prev_week
 
     # Shorter sleep (6 hours)
     short_sleep = @user_two.sleeps.create!(
@@ -129,7 +129,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   test "should sort sleeps without stopped_at_raw or duration at the bottom" do
     @user_one.following_others << @user_two
 
-    prev_week_start = Time.current.prev_week.beginning_of_week
+    prev_week_start = Time.current.prev_week
 
     # Sleep with duration (should be at top)
     completed_sleep = @user_two.sleeps.create!(
@@ -162,7 +162,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   test "should paginate results" do
     @user_one.following_others << @user_two
 
-    prev_week_start = Time.current.prev_week.beginning_of_week
+    prev_week_start = Time.current.prev_week
 
     # Create 3 sleep records from previous week
     sleep1 = @user_two.sleeps.create!(

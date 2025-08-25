@@ -9,8 +9,8 @@ class CreateSleeps < ActiveRecord::Migration[8.0]
       t.integer "user_id", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["started_at_utc", "duration"], name: "index_sleeps_on_started_at_utc_and_duration"
-      t.index ["user_id", "started_at_utc", "duration"], name: "index_sleeps_on_user_id_and_started_at_utc_and_duration"
+      t.index [ "started_at_utc", "duration" ], name: "index_sleeps_on_started_at_utc_and_duration"
+      t.index [ "user_id", "started_at_utc", "duration" ], name: "index_sleeps_on_user_id_and_started_at_utc_and_duration"
     end
   end
 end
