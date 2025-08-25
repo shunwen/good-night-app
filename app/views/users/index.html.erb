@@ -7,7 +7,7 @@
 
   <% if @users.any? %>
     <div class="users-list">
-      <% @users.each do |user| %>
+      <% @users.find_each do |user| %>
         <%= render 'user_card', user: user %>
       <% end %>
     </div>

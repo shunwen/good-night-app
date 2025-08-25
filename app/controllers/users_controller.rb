@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @users = User.all
+    @users = User.all.includes(:sleeps, :follows)
   end
 
   # GET /users/1 or /users/1.json
@@ -44,7 +44,7 @@ class UsersController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      if params[:id] == 'current'
+      if params[:id] == "current"
         @user = Current.user
       else
         @user = User.find(params[:id])
