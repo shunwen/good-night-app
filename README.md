@@ -104,7 +104,6 @@ Sleeps data is partitioned, Follows are sharded.
 - Time-partitioned db for `sleeps`:
     - Move sleeps started before the previous week to a
       separate DB and read from it for other APIs.
-        - Enqueue background job to move outdated data to this DB.
     - It's easier to loose the FK on `sleeps.user_id` for either option.
     - Smaller table size for previous week sleeps
 
