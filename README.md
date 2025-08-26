@@ -8,8 +8,8 @@
 - Set up database `rails db:setup`
 - Run migrations `rails db:migrate`
 - Start Rails server `rails server`
-- Test APIs at https://localhost:3000/api_test (created with Claude Code,
-  not all APIs are supported here). It doesn't refresh information
+- Test APIs at https://localhost:3000/api_test _(created with Claude Code,
+  not all APIs are supported here)_. It doesn't refresh information
   automatically, manual refresh the page to keep things up to date.
 
 ## Assumptions
@@ -19,7 +19,7 @@ For simplicity:
 - No user registration features. Create users through the API test page
   or Rails console: `user = User.create!(name: "your_name")`.
 - Simple authentication base on encrypted user id in cookie. Use
-  `POST /session` with payload `{user_id: "your user id"}` to get the signed
+  `POST /session` with payload `{"user_id": "your user id"}` to get the signed
   cookie. Use `DELETE /session` to sign out.
 - Users have only two attributes: `id` and `name`.
 - HTML views from scaffolding remain for easier manual testing.
@@ -54,10 +54,11 @@ id"}` to get the signed cookie. Routes under `users`
   user is still sleeping.
     - Create: `POST /users/sleeps` with payload `{"started_at_raw": 
     "2024-01-01T23:00:00+09:00", "stopped_at_raw": "2024-01-02T07:00:00+09:00"}`
-      - stopped_at_raw is optional
-      - duration will be derived when both started and stopped are present
+        - stopped_at_raw is optional
+        - duration will be derived when both started and stopped are present
     - Read: `GET /users/sleeps` for index and `GET /users/sleeps/:id` for show
-    - Update: `PATCH /users/sleeps/:id` with payload `{"stopped_at_raw": "2024-01-02T08:00:00+09:00"}`
+    - Update: `PATCH /users/sleeps/:id` with payload
+      `{"stopped_at_raw": "2024-01-02T08:00:00+09:00"}`
     - Delete: `DELETE /users/sleeps/:id`
     - Old sleeps (sleeps stated at before previous week) cannot be updated
     - Any `Date.parse` compatible string works.
@@ -65,6 +66,11 @@ id"}` to get the signed cookie. Routes under `users`
     - _Note: Can create future sleep_
 - **[Requirement 2]** Users can follow/unfollow others. No self-following not
   allowed. No duplicate follows.
+    - Create: `POST /users/following_others` with payload
+      `{"followed_id": "id of the user to follow"}`
+    - Update: N/A
+    - Read: `GET /users/following_others`, `GET /users/following_others/:id`
+    - Delete: `Delete /users/following_others/:id`
 - **[Requirement 3]** With `user_id` cookie set, visit
   `/users/following_others/prev_week_sleeps` via JSON API or HTML. Previous week
   defined by `Time.current.prev_week.all_week`.
