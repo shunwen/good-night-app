@@ -7,23 +7,30 @@
 - Set up database `rails db:setup`
 - Start Rails server `rails server`
 - Test APIs at https://localhost:3000/api_test (created with Claude Code,
-not all APIs are supported here).
+  not all APIs are supported here). It doesn't refresh information
+  automatically, manual refresh the page to keep things up to date.
 
 ## Assumptions
 
 For simplicity:
 
-- No user registration features. Create users through the API test page 
+- No user registration features. Create users through the API test page
   or Rails console: `user = User.create!(name: "your_name")`.
-- Casual authentication uses cookie-based sessions. It's still signed, use 
-  `POST /session` with payload `{user_id: "your user id"}` to get the signed cookie. 
+- Casual authentication uses cookie-based sessions. It's still signed, use
+  `POST /session` with payload `{user_id: "your user id"}` to get the signed
+  cookie.
   Use `DELETE /session` to sign out.
 - Users have only two attributes: `id` and `name`.
 - HTML views from scaffolding remain for easier manual testing.
+- Basic "follow" functionality is implemented. Due to sharding, it takes extra
+  steps to retrieve one's followers, some related features are removed.
+- Additional operations are not automated, e.g. `ArchiveOldSleepsJob` needs 
+  further scheduling before going to production.
 
 ## Requirements
 
-- For API routes, see `config/routes.rb`. Most APIs follow Rails conventions. Check `schema.rb` for model attributes.
+- For API routes, see `config/routes.rb`. Most APIs follow Rails conventions.
+  Check `schema.rb` for model attributes.
   ```ruby
   namespace :users do
     resources :sleeps
@@ -35,41 +42,72 @@ For simplicity:
   end
   resources :users, only: [:index, :show, :new, :create, :destroy]
   ```
-- Set cookie `user_id` to identify the current user. Routes under `users` namespace operate on the current user implicitly.
-- **[Requirement 1]** Track sleep with `started_at_raw` (bedtime) and `stopped_at_raw` (wake time). Both accept datetime strings with timezone info (e.g. `2024-01-01T23:00:00+09:00`). App converts to UTC and calculates `duration`. Only `started_at_raw` is required - missing `stopped_at_raw` means user is still sleeping.
+- Set cookie `user_id` to identify the current user. Routes under `users`
+  namespace operate on the current user implicitly.
+- **[Requirement 1]** Track sleep with `started_at_raw` (bedtime) and
+  `stopped_at_raw` (wake time). Both accept datetime strings with timezone
+  info (e.g. `2024-01-01T23:00:00+09:00`). App converts to UTC and calculates
+  `duration`. Only `started_at_raw` is required - missing `stopped_at_raw` means
+  user is still sleeping.
     - Any `Date.parse` compatible string works.
     - Raw data stored for future timezone features.
-- **[Requirement 2]** Users can follow/unfollow others. Self-following not allowed. No duplicate follows.
-- **[Requirement 3]** With `user_id` cookie set, visit `/users/following_others/prev_week_sleeps` via JSON API or HTML. Previous week defined by `Time.current.prev_week.all_week`.
+- **[Requirement 2]** Users can follow/unfollow others. Self-following not
+  allowed. No duplicate follows.
+- **[Requirement 3]** With `user_id` cookie set, visit
+  `/users/following_others/prev_week_sleeps` via JSON API or HTML. Previous week
+  defined by `Time.current.prev_week.all_week`.
 
 ## Performance Considerations
 
-### Implemented
-- Indexes
-- Pagination
-- Follow limits
-- Response compression, for demo purpose enable in development
+### For Concurrency
 
-### Basics
-1. **Indexes**
-    - Sleeps table: `user_id` and `started_at_utc` for user/date filtering
-    - Follows table: `follower_id` and `followed_id` for relationship lookups
-2. **Pagination** - More users means larger prev_week_sleeps responses. Paginate to reduce memory usage.
-3. **Follow limits** - Set upper limit per user (e.g. 5000 like X) to prevent excessive growth.
-4. **Counter caches** - APIs don't need counts currently. If added later, use counter caches for expensive COUNT queries.
-5. **Caching** - Cache prev_week_sleeps results per user for 5+ minutes, or 
-   implement cache invalidation based on follows' sleep updates. With 
-   pagination, cache can be tricky, so skipped.
-6. **Response compression**
-7. **Pregeneration** - After users update sleeps, enqueue background jobs to
-   pregenerate prev_week_sleeps data for followers. Read from the
-   pregenerated data.
- 
-### Advanced
-1. **Data Volume** - 1 sleep record ≈ 120 bytes. 100 years per user ≈ 4MB. Global scale (8B users) ≈ 32PB over 100 years.
-2. **Archival** - Archive old data to cheaper storage. Keep recent data hot, sync historical data to user devices.
-3. **Traffic Distribution** - Global usage spreads requests across 24 hours due to time zones (though not evenly).
-4. **Scaling Example** - To handle 25k req/s (number based on 2011 Japan 
-   twitter incident): need ~100 servers (assuming 250 req/s per Rails server). 
+The goal is to shorten response time such that the server can handle more
+concurrent requests.
+
+- Indexes: improve query efficiency
+    - Indexes on sleeps table's `started_at_utc` and `duration`
+    - Indexes on follow table's `follower_id` and `followed_id`, and an unique
+      index on both
+- Pagination: limit data per request. On prev_week_sleeps API, which can
+  return many records.
+- Follow limits: prevent excessive follows per user, set a predictable upper
+  bound
+- Response compression: normally done by web server, but enabled here for demo
+  purposes
+
+### For Large Data Volume
+
+The goal is to retrieve data efficiently even with large datasets. The data
+size is not a concern as long as the stored information has its purpose.
+
+Sleeps data is partitioned, Follows are shared.
+
+- Time-partitioned db for `sleeps`:
+    - Option 1: store sleeps started after the previous week in a
+      separate DB and read from it for prev_week_sleeps API.
+        - Schedule background job to remove outdated data from this DB.
+    - Option 2: move sleeps started before the previous week to a
+      separate DB and read from it for other APIs.
+        - Enqueue background job to move outdated data to this DB.
+    - It's easier to loose the FK on `sleeps.user_id` for either option.
+
+- Sharding for `follows`:
+    - Horizontal partitioning by `follower_id mod 2` across 2 shard databases
+    - Implemented via `Follow` class that routes to appropriate shard
+    - Each user's follow relationships stored in consistent shard based on their
+      ID
+
+### Caching
+
+Caching is not implemented. Caching would require corresponding mechanisms to 
+invalidate cache. I'm out of time here.
+
+### Notes
+
+1. **Data Volume** - 1 sleep record ≈ 120 bytes. 100 years per user ≈ 4MB.
+   Global scale (8B users) ≈ 32PB over 100 years.
+2. **Traffic Distribution** - Global usage spreads requests across 24 hours due
+   to time zones (though not evenly).
+3. **Scaling Example** - To handle 25k req/s (number based on 2011 Japan
+   twitter incident): need ~100 servers (assuming 250 req/s per Rails server).
    Sleep creation at 1kB/req = 25MB/s, well below SSD write speeds (6-12GB/s).
-5. **Database Scaling** - Use read replicas for read traffic distribution, sharding for write traffic distribution when Ruby/database becomes the bottleneck.
