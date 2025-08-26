@@ -34,6 +34,10 @@ class Sleep < ApplicationRecord
     end
   end
 
+  def old?
+    started_at_utc < Time.current.prev_week
+  end
+
   private
 
     def started_at_before_stopped_at

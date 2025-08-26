@@ -1,5 +1,6 @@
 class Users::SleepsController < ApplicationController
   before_action :set_sleep, only: %i[ show edit update destroy ]
+  before_action :forbid_update_old_sleep, only: %i[ update ]
 
   # GET /sleeps or /sleeps.json
   def index
@@ -17,6 +18,11 @@ class Users::SleepsController < ApplicationController
 
   # GET /sleeps/1/edit
   def edit
+    if @sleep.old?
+      redirect_to(
+        users_sleep_path(@sleep),
+        alert: "Cannot edit old sleep records.")
+    end
   end
 
   # POST /sleeps or /sleeps.json
@@ -66,6 +72,10 @@ class Users::SleepsController < ApplicationController
           sleep = Sleep.find_across_partitions(params[:id])
           sleep.user == Current.user ? sleep : head(:not_found)
         end
+    end
+
+    def forbid_update_old_sleep
+      head :forbidden if @sleep.old?
     end
 
     # Only allow a list of trusted parameters through.
