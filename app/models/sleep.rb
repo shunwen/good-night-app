@@ -13,7 +13,7 @@ class Sleep < ApplicationRecord
 
   # Class method to find sleep across partitions
   def self.find_across_partitions(id)
-    find_by(id: id) || Archive::Sleep.find(id)
+    find_by(id:) || Archive::Sleep.find(id)
   end
 
   # Class method to search across partitions by date range
