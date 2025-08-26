@@ -18,15 +18,14 @@ For simplicity:
 
 - No user registration features. Create users through the API test page
   or Rails console: `user = User.create!(name: "your_name")`.
-- Casual authentication uses cookie-based sessions. It's still signed, use
+- Simple authentication base on encrypted user id in cookie. Use
   `POST /session` with payload `{user_id: "your user id"}` to get the signed
-  cookie.
-  Use `DELETE /session` to sign out.
+  cookie. Use `DELETE /session` to sign out.
 - Users have only two attributes: `id` and `name`.
 - HTML views from scaffolding remain for easier manual testing.
 - Basic "follow" functionality is implemented. Due to sharding, it takes extra
   steps to retrieve one's followers, some related features are removed.
-- Additional operations are not automated, e.g. `ArchiveOldSleepsJob` needs 
+- Additional operations are not automated, e.g. `ArchiveOldSleepsJob` needs
   further scheduling before going to production.
 
 ## API (vs. Requirements)
@@ -44,8 +43,8 @@ For simplicity:
   end
   resources :users, only: [:index, :show, :new, :create, :destroy]
   ```
-- To pass the auth, `POST /session` with payload `{user_id: "your user id"}` to get the signed
-  cookie.. Routes under `users`
+- To pass authentication, `POST /session` with payload `{user_id: "your user 
+id"}` to get the signed cookie. Routes under `users`
   namespace operate on the current user implicitly.
 - **[Requirement 1]** Track sleep with `started_at_raw` (bedtime) and
   `stopped_at_raw` (wake time). Both accept datetime strings with timezone
@@ -54,7 +53,7 @@ For simplicity:
   user is still sleeping.
     - Any `Date.parse` compatible string works.
     - Raw data stored for future timezone features.
-- **[Requirement 2]** Users can follow/unfollow others. Self-following not
+- **[Requirement 2]** Users can follow/unfollow others. No self-following not
   allowed. No duplicate follows.
 - **[Requirement 3]** With `user_id` cookie set, visit
   `/users/following_others/prev_week_sleeps` via JSON API or HTML. Previous week
@@ -103,16 +102,19 @@ Sleeps data is partitioned, Follows are shared.
 ### For Growing User Base
 
 **Not sharding the users table**:
-- Simple 3-field schema (id, name, timestamps) doesn't benefit from sharding complexity
-- Cross-user queries (following, sleep comparisons) would require 
-  cross-shard operations  
-- Scale with read replicas and caching instead 
 
-User-generated data (sleeps, follows) can be sharded while keeping users centralized.
+- Simple 3-field schema (id, name, timestamps) doesn't benefit from sharding
+  complexity
+- Cross-user queries (following, sleep comparisons) would require
+  cross-shard operations
+- Scale with read replicas and caching instead
+
+User-generated data (sleeps, follows) can be sharded while keeping users
+centralized.
 
 ### Caching
 
-Caching is not implemented. Caching would require corresponding mechanisms to 
+Caching is not implemented. Caching would require corresponding mechanisms to
 invalidate cache. I'm out of time here.
 
 ### Notes
