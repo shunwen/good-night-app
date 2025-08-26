@@ -1,6 +1,6 @@
 class TestData
-  def self.setup!(user_count: 1000, follows_per_user: 500, sleeps_per_user: 300)
-    Follow.delete_all
+  def self.setup!(user_count: 1000, follows_per_user: 50, sleeps_per_user: 300)
+    ShardedFollow.delete_all
     Sleep.delete_all
     User.delete_all
 
@@ -24,20 +24,11 @@ class TestData
     # Generate follow relationships based on follows_per_user parameter
     follows_params = []
     if follows_per_user > 0
-      follows_params = user_ids.flat_map do |follower_id|
-        # Calculate actual follow count (can't exceed available users)
-        actual_follows_count = [ follows_per_user, user_count - 1 ].min
-
-        user_ids.excluding(follower_id).sample(actual_follows_count).map do |followed_id|
-          {
-            follower_id:,
-            followed_id:,
-            created_at: start_time + 1,
-            updated_at: start_time + 1
-          }
+      follows_params = User.all.find_each do |user|
+        user_ids.excluding(user.id).sample(follows_per_user).each do |followed_id|
+          user.follows.create!(followed_id:)
         end
       end
-      Follow.insert_all(follows_params) if follows_params.any?
     end
 
     # Prepare sleep records for all users based on sleeps_per_user parameter
