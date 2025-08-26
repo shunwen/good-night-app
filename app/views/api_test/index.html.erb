@@ -150,7 +150,6 @@ function showAuthStatus(status, user, userId) {
             <p><strong>Name:</strong> ${user.name}</p>
             <p><strong>Sleep Records:</strong> ${user.sleeps_count || 0}</p>
             <p><strong>Following:</strong> ${user.following_count || 0} users</p>
-            <p><strong>Followers:</strong> ${user.followers_count || 0} users</p>
             <p><strong>Created:</strong> ${new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
         </div>`;
