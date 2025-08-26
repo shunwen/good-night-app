@@ -73,8 +73,7 @@ id"}` to get the signed cookie. Routes under `users`
     - Delete: `DELETE /users/following_others/:id`
 - **[Requirement 3]** With `user_id` cookie set, 
   `GET /users/following_others/prev_week_sleeps` via JSON API or HTML.
-  - Previous 
-    week defined by `Time.current.prev_week.all_week`.
+  - Previous week defined by `Time.current.prev_week.all_week`.
 
 ## Performance Considerations
 
