@@ -26,8 +26,8 @@ class Sleep < ApplicationRecord
   end
 
   # Method to archive old sleeps (before previous week)
-  def self.archive_old_sleeps!
-    old.find_each.map do |sleep|
+  def self.archive_old_sleeps!(rows: 1000)
+    old.limit(rows).find_each.map do |sleep|
       archived = Archive::Sleep.create!(sleep.attributes)
       sleep.destroy!
       [ sleep, archived ]

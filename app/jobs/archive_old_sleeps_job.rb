@@ -1,7 +1,7 @@
 class ArchiveOldSleepsJob < ApplicationJob
   queue_as :default
 
-  def perform
-    Sleep.archive_old_sleeps!
+  def perform(rows = 1000)
+    Sleep.archive_old_sleeps!(rows)
   end
 end
