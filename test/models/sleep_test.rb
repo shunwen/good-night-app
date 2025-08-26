@@ -184,4 +184,21 @@ class SleepTest < ActiveSupport::TestCase
     assert all_sleeps[0].started_at_utc < all_sleeps[1].started_at_utc
     assert all_sleeps[1].started_at_utc < all_sleeps[2].started_at_utc
   end
+
+  test "should identify old sleeps correctly" do
+    old_sleep = Sleep.create!(
+      user: users(:one),
+      started_at_raw: 2.weeks.ago.iso8601,
+      stopped_at_raw: (2.weeks.ago + 8.hours).iso8601
+    )
+
+    recent_sleep = Sleep.create!(
+      user: users(:one),
+      started_at_raw: 3.days.ago.iso8601,
+      stopped_at_raw: (3.days.ago + 7.hours).iso8601
+    )
+
+    assert old_sleep.old?
+    assert_not recent_sleep.old?
+  end
 end

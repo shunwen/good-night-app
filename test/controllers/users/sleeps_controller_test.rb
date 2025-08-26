@@ -2,7 +2,10 @@ require "test_helper"
 
 class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @sleep = sleeps(:one)
+    @sleep = users(:one).sleeps.create!(
+      started_at_raw: Date.yesterday.beginning_of_day,
+      stopped_at_raw: Date.yesterday.beginning_of_day + 8.hours
+    )
     sign_in @sleep.user
   end
 
@@ -18,7 +21,9 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create sleep" do
     assert_difference("Sleep.count") do
-      post users_sleeps_url, params: { sleep: { started_at_raw: @sleep.started_at_raw, stopped_at_raw: @sleep.stopped_at_raw } }
+      post users_sleeps_url,
+           params: { sleep: { started_at_raw: @sleep.started_at_raw,
+                              stopped_at_raw: @sleep.stopped_at_raw } }
     end
 
     assert_redirected_to users_sleep_url(Sleep.last)
@@ -35,7 +40,9 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update sleep" do
-    patch users_sleep_url(@sleep), params: { sleep: { started_at_raw: @sleep.started_at_raw, stopped_at_raw: @sleep.stopped_at_raw } }
+    patch users_sleep_url(@sleep),
+          params: { sleep: { started_at_raw: @sleep.started_at_raw,
+                             stopped_at_raw: @sleep.stopped_at_raw } }
     assert_redirected_to users_sleep_url(@sleep)
   end
 
@@ -62,7 +69,10 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create sleep as json" do
     assert_difference("Sleep.count") do
-      post users_sleeps_url, params: { sleep: { started_at_raw: "2025-01-01 22:00:00", stopped_at_raw: "2025-01-02 06:00:00" } }, as: :json
+      post users_sleeps_url,
+           params: { sleep: { started_at_raw: "2025-01-01 22:00:00",
+                              stopped_at_raw: "2025-01-02 06:00:00" } },
+           as: :json
     end
 
     assert_response :created
@@ -70,7 +80,9 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update sleep as json" do
-    patch users_sleep_url(@sleep), params: { sleep: { started_at_raw: "2025-01-01 21:00:00" } }, as: :json
+    patch users_sleep_url(@sleep),
+          params: { sleep: { started_at_raw: "2025-01-01 21:00:00" } },
+          as: :json
     assert_response :success
     assert_equal "application/json", response.media_type
   end
@@ -84,8 +96,23 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should return unprocessable content for invalid sleep as json" do
-    post users_sleeps_url, params: { sleep: { started_at_raw: nil } }, as: :json
+    post users_sleeps_url,
+         params: { sleep: { started_at_raw: nil } },
+         as: :json
     assert_response :unprocessable_content
     assert_equal "application/json", response.media_type
+  end
+
+  test "should not allow editing old sleeps as json" do
+    old_sleep = users(:one).sleeps.create!(
+      started_at_raw: 2.weeks.ago.iso8601,
+      stopped_at_raw: (2.weeks.ago + 8.hours).iso8601
+    )
+
+    patch users_sleep_url(old_sleep),
+          params: { sleep: { stopped_at_raw: (2.weeks.ago + 9.hours).iso8601 } },
+          as: :json
+    
+    assert_response :forbidden
   end
 end
