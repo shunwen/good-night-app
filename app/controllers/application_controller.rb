@@ -4,7 +4,5 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   # Skip CSRF verification for JSON API requests
-  skip_before_action :verify_authenticity_token,
-                     if: -> {
-                       request.format.json? || request.content_type == 'application/json' }
+  skip_before_action :verify_authenticity_token, if: -> { request.format.json? }
 end
