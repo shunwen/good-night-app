@@ -1,6 +1,6 @@
 class TestData
   def self.setup!(user_count: 1000, follows_per_user: 50, sleeps_per_user: 300)
-    ShardedFollow.delete_all
+    ShardRecord.connected_to_all_shards { ShardedFollow.delete_all }
     Sleep.delete_all
     User.delete_all
 
@@ -41,12 +41,15 @@ class TestData
       Sleep.insert_all(sleep_params) if sleep_params.any?
     end
 
+    Sleep.archive_old_sleeps!
+
     total_time = Time.current - start_time
 
     {
       users_created: user_count,
-      follows_created: follows_params.count,
+      follows_created: ShardRecord.connected_to_all_shards { ShardedFollow.count }.sum,
       sleep_records_created: sleep_params.count,
+      archived_sleep_records: Archive::Sleep.count,
       total_time_seconds: total_time.round(2),
       user_ids: user_ids
     }

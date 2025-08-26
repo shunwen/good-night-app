@@ -19,10 +19,10 @@
       <div class="test-data-form">
         <div class="form-row">
           <label for="user-count">Users:</label>
-          <input type="number" id="user-count" value="1000" min="1" max="10000">
+          <input type="number" id="user-count" value="100" min="1" max="10000">
           
           <label for="follows-per-user">Follows per user:</label>
-          <input type="number" id="follows-per-user" value="500" min="0" max="1000">
+          <input type="number" id="follows-per-user" value="50" min="0" max="1000">
           
           <label for="sleeps-per-user">Sleeps per user:</label>
           <input type="number" id="sleeps-per-user" value="300" min="0" max="1000">
@@ -783,8 +783,8 @@ async function createBulkTestData() {
   const startTime = Date.now();
   
   // Get parameters from form inputs
-  const userCount = parseInt(document.getElementById('user-count').value) || 1000;
-  const followsPerUser = parseInt(document.getElementById('follows-per-user').value) || 500;
+  const userCount = parseInt(document.getElementById('user-count').value) || 100;
+  const followsPerUser = parseInt(document.getElementById('follows-per-user').value) || 50;
   const sleepsPerUser = parseInt(document.getElementById('sleeps-per-user').value) || 300;
   
   // Show result container and switch to progress tab immediately
