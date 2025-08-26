@@ -3,5 +3,7 @@ module Archive
     self.table_name = "sleeps"
 
     belongs_to :user, required: true
+
+    def old? = true
   end
 end
