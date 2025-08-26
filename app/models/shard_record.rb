@@ -11,7 +11,6 @@ class ShardRecord < ApplicationRecord
     "shard_#{user_id.to_i % 2}".to_sym
   end
 
-  # Connect to appropriate shard for writing
   def self.with_shard(user_id, &block)
     shard = shard_for(user_id)
     connected_to(database: { writing: shard, reading: shard }, &block)
