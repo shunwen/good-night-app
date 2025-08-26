@@ -116,9 +116,6 @@ Sleeps data is partitioned, Follows are sharded.
 ### For Growing User Base
 
 **Not sharding the users table**:
-
-- Simple 3-field schema (id, name, timestamps) doesn't benefit from sharding
-  complexity
 - Cross-user queries (following, sleep comparisons) would require
   cross-shard operations
 - Scale with read replicas and caching instead
