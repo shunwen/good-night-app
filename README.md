@@ -101,13 +101,11 @@ size is not a concern as long as the stored information has its purpose.
 Sleeps data is partitioned, Follows are shared.
 
 - Time-partitioned db for `sleeps`:
-    - Option 1: store sleeps started after the previous week in a
-      separate DB and read from it for prev_week_sleeps API.
-        - Schedule background job to remove outdated data from this DB.
-    - Option 2: move sleeps started before the previous week to a
+    - Move sleeps started before the previous week to a
       separate DB and read from it for other APIs.
         - Enqueue background job to move outdated data to this DB.
     - It's easier to loose the FK on `sleeps.user_id` for either option.
+    - Smaller table size for previous week sleeps
 
 - Sharding for `follows`:
     - Horizontal partitioning by `follower_id mod 2` across 2 shard databases
