@@ -25,6 +25,14 @@ development:
     <<: *default
     database: storage/development_archive.sqlite3
     migrations_paths: db/archive_migrate
+  shard_0:
+    <<: *default
+    database: storage/development_shard_0.sqlite3
+    migrations_paths: db/shard_migrate
+  shard_1:
+    <<: *default
+    database: storage/development_shard_1.sqlite3
+    migrations_paths: db/shard_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -37,6 +45,14 @@ test:
     <<: *default
     database: storage/test_archive.sqlite3
     migrations_paths: db/archive_migrate
+  shard_0:
+    <<: *default
+    database: storage/test_shard_0.sqlite3
+    migrations_paths: db/shard_migrate
+  shard_1:
+    <<: *default
+    database: storage/test_shard_1.sqlite3
+    migrations_paths: db/shard_migrate
 
 # Store production database in the storage/ directory, which by default
 # is mounted as a persistent Docker volume in config/deploy.yml.
@@ -60,3 +76,11 @@ production:
     <<: *default
     database: storage/production_archive.sqlite3
     migrations_paths: db/archive_migrate
+  shard_0:
+    <<: *default
+    database: storage/production_shard_0.sqlite3
+    migrations_paths: db/shard_migrate
+  shard_1:
+    <<: *default
+    database: storage/production_shard_1.sqlite3
+    migrations_paths: db/shard_migrate
