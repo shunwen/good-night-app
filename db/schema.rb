@@ -10,17 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_24_130318) do
-  create_table "follows", force: :cascade do |t|
-    t.integer "follower_id", null: false
-    t.integer "followed_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["followed_id"], name: "index_follows_on_followed_id"
-    t.index ["follower_id", "followed_id"], name: "index_follows_on_follower_id_and_followed_id_unique", unique: true
-    t.index ["follower_id"], name: "index_follows_on_follower_id"
-  end
-
+ActiveRecord::Schema[8.0].define(version: 2025_08_26_040411) do
   create_table "sleeps", force: :cascade do |t|
     t.string "started_at_raw", null: false
     t.datetime "started_at_utc", null: false
@@ -41,7 +31,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_24_130318) do
     t.index ["name"], name: "index_users_on_name", unique: true
   end
 
-  add_foreign_key "follows", "users", column: "followed_id"
-  add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "sleeps", "users"
 end
