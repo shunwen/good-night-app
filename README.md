@@ -62,6 +62,7 @@ id"}` to get the signed cookie. Routes under `users`
     - Old sleeps (sleeps stated at before previous week) cannot be updated
     - Any `Date.parse` compatible string works.
     - Raw data stored for future timezone features.
+    - _Note: Can create future sleep_
 - **[Requirement 2]** Users can follow/unfollow others. No self-following not
   allowed. No duplicate follows.
 - **[Requirement 3]** With `user_id` cookie set, visit
