@@ -26,7 +26,7 @@ class Follow
 
   def destroy!(followed_id:)
     with_shard do
-      sharded.where(followed_id:).destroy
+      sharded.where(followed_id:).destroy_all
     end
   end
 
