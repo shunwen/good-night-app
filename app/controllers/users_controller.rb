@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @users = User.all.includes(:sleeps, :follows)
+    @users = User.all.includes(:sleeps)
   end
 
   # GET /users/1 or /users/1.json
