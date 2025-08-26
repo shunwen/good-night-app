@@ -98,7 +98,7 @@ concurrent requests.
 The goal is to retrieve data efficiently even with large datasets. The data
 size is not a concern as long as the stored information has its purpose.
 
-Sleeps data is partitioned, Follows are shared.
+Sleeps data is partitioned, Follows are sharded.
 
 - Time-partitioned db for `sleeps`:
     - Move sleeps started before the previous week to a
