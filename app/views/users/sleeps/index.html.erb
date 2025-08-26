@@ -6,7 +6,7 @@
 
 <div id="sleeps">
   <% @sleeps.each do |sleep| %>
-    <%= render sleep %>
+    <%= render partial: 'users/sleeps/sleep', locals: { sleep: } %>
     <p>
       <%= link_to "Show this sleep", users_sleep_path(sleep) %>
     </p>
