@@ -4,7 +4,8 @@
     method: "POST",
     url: "/users",
     description: "Create a new user",
-    sample_payload: { user: { name: "Test User" } }
+    sample_payload: { user: { name: "Test User" } },
+    auth_required: true
   }
   index = 0
 %>
@@ -14,15 +15,20 @@
     <span class="method"><%= endpoint[:method] %></span>
     <span class="url"><%= endpoint[:url] %></span>
     <span class="desc"><%= endpoint[:description] %></span>
+    <% if endpoint[:auth_required] %>
+      <span class="auth-required">Auth Required</span>
+    <% else %>
+      <span class="no-auth">No Auth</span>
+    <% end %>
   </div>
-  
+
   <% if endpoint[:sample_payload] %>
     <details class="payload">
       <summary>Payload</summary>
       <pre><%= JSON.pretty_generate(endpoint[:sample_payload]) %></pre>
     </details>
   <% end %>
-  
+
   <div class="actions">
     <button onclick="testEndpoint('<%= endpoint[:method] %>', '<%= endpoint[:url] %>', <%= endpoint[:sample_payload]&.to_json || 'null' %>)">
       Test
@@ -31,7 +37,7 @@
       Perf (10x)
     </button>
   </div>
-  
+
   <div id="result-<%= index %>" class="result hidden">
     <div class="tabs">
       <button class="tab active" onclick="showTab(this, 'summary-<%= index %>')">Summary</button>
