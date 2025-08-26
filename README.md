@@ -29,7 +29,7 @@ For simplicity:
 - Additional operations are not automated, e.g. `ArchiveOldSleepsJob` needs 
   further scheduling before going to production.
 
-## Requirements
+## API (vs. Requirements)
 
 - For API routes, see `config/routes.rb`. Most APIs follow Rails conventions.
   Check `schema.rb` for model attributes.
@@ -44,7 +44,8 @@ For simplicity:
   end
   resources :users, only: [:index, :show, :new, :create, :destroy]
   ```
-- Set cookie `user_id` to identify the current user. Routes under `users`
+- To pass the auth, `POST /session` with payload `{user_id: "your user id"}` to get the signed
+  cookie.. Routes under `users`
   namespace operate on the current user implicitly.
 - **[Requirement 1]** Track sleep with `started_at_raw` (bedtime) and
   `stopped_at_raw` (wake time). Both accept datetime strings with timezone
