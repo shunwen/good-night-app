@@ -4,7 +4,7 @@
 
 - Clone repo
 - Add master.key `echo c1b530bcd1d3fe4c0d7c99bff24cd1d6 > config/master.key`.
-  **Just for demo purpose**.
+  *Just for demo*.
 - Set up database `rails db:setup`
 - Run migrations `rails db:migrate`
 - Start Rails server `rails server`
