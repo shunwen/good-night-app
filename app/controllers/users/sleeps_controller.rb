@@ -3,7 +3,7 @@ class Users::SleepsController < ApplicationController
 
   # GET /sleeps or /sleeps.json
   def index
-    @sleeps = Current.user.sleeps.order(started_at_utc: :desc)
+    @sleeps = Sleep.where_across_partitions(user: Current.user)
   end
 
   # GET /sleeps/1 or /sleeps/1.json
@@ -61,7 +61,11 @@ class Users::SleepsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_sleep
-      @sleep = Current.user.sleeps.find(params.expect(:id))
+      @sleep =
+        begin
+          sleep = Sleep.find_across_partitions(params[:id])
+          sleep.user == Current.user ? sleep : head(:not_found)
+        end
     end
 
     # Only allow a list of trusted parameters through.
