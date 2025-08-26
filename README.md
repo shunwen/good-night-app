@@ -50,8 +50,7 @@ id"}` to get the signed cookie. Routes under `users`
 - **[Requirement 1]** Track sleep with `started_at_raw` (bedtime) and
   `stopped_at_raw` (wake time). Both accept datetime strings with timezone
   info (e.g. `2024-01-01T23:00:00+09:00`). App converts to UTC and calculates
-  `duration`. Only `started_at_raw` is required - missing `stopped_at_raw` means
-  user is still sleeping.
+  `duration`. 
     - Create: `POST /users/sleeps` with payload `{"started_at_raw": 
     "2024-01-01T23:00:00+09:00", "stopped_at_raw": "2024-01-02T07:00:00+09:00"}`
         - stopped_at_raw is optional
