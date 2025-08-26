@@ -43,7 +43,8 @@ For simplicity:
   end
   resources :users, only: [:index, :show, :new, :create, :destroy]
   ```
-- To pass authentication, `POST /session` with payload `{user_id: "your user 
+- To use JSON API, in request set header `Accept` = `application/json`
+- To pass authentication, `POST /session` with payload `{"user_id": "your user 
 id"}` to get the signed cookie. Routes under `users`
   namespace operate on the current user implicitly.
 - **[Requirement 1]** Track sleep with `started_at_raw` (bedtime) and
@@ -51,6 +52,14 @@ id"}` to get the signed cookie. Routes under `users`
   info (e.g. `2024-01-01T23:00:00+09:00`). App converts to UTC and calculates
   `duration`. Only `started_at_raw` is required - missing `stopped_at_raw` means
   user is still sleeping.
+    - Create: `POST /users/sleeps` with payload `{"started_at_raw": 
+    "2024-01-01T23:00:00+09:00", "stopped_at_raw": "2024-01-02T07:00:00+09:00"}`
+      - stopped_at_raw is optional
+      - duration will be derived when both started and stopped are present
+    - Read: `GET /users/sleeps` for index and `GET /users/sleeps/:id` for show
+    - Update: `PATCH /users/sleeps/:id` with payload `{"stopped_at_raw": "2024-01-02T08:00:00+09:00"}`
+    - Delete: `DELETE /users/sleeps/:id`
+    - Old sleeps (sleeps stated at before previous week) cannot be updated
     - Any `Date.parse` compatible string works.
     - Raw data stored for future timezone features.
 - **[Requirement 2]** Users can follow/unfollow others. No self-following not
