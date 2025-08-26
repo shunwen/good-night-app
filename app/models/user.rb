@@ -8,6 +8,8 @@ class User < ApplicationRecord
     ShardRecord.connected_to_all_shards(role: :writing) do
       ShardedFollow.where(followed_id: id).delete_all
     end
+
+    follows.sharded.delete_all
   end
 
   def follows
