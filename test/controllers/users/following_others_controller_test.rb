@@ -19,7 +19,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create follow" do
-    assert_difference("Follow.count") do
+    assert_difference(-> { @user_one.follows.count }) do
       post users_following_others_url, params: { followed_id: @user_two.id }
     end
 
@@ -30,7 +30,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   test "should not create duplicate follow" do
     @user_one.follow(@user_two)
 
-    assert_no_difference("Follow.count") do
+    assert_no_difference -> { @user_one.follows.count } do
       post users_following_others_url, params: { followed_id: @user_two.id }
     end
 
@@ -39,7 +39,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not follow self" do
-    assert_no_difference("Follow.count") do
+    assert_no_difference -> { @user_one.follows.count } do
       post users_following_others_url, params: { followed_id: @user_one.id }
     end
 
@@ -50,7 +50,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   test "should destroy follow" do
     follow = @user_one.follow(@user_two)
 
-    assert_difference("Follow.count", -1) do
+    assert_difference(-> { @user_one.follows.count }, -1) do
       delete users_following_other_url(@user_two)
     end
 
@@ -66,7 +66,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
 
   # JSON API tests
   test "should create follow as json" do
-    assert_difference("Follow.count") do
+    assert_difference -> { @user_one.follows.count } do
       post users_following_others_url, params: { followed_id: @user_two.id }, as: :json
     end
 
@@ -77,7 +77,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   test "should not create duplicate follow as json" do
     @user_one.follow(@user_two)
 
-    assert_no_difference("Follow.count") do
+    assert_no_difference -> { @user_one.follows.count } do
       post users_following_others_url, params: { followed_id: @user_two.id }, as: :json
     end
 
@@ -86,7 +86,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not follow self as json" do
-    assert_no_difference("Follow.count") do
+    assert_no_difference -> { @user_one.follows.count } do
       post users_following_others_url, params: { followed_id: @user_one.id }, as: :json
     end
 
@@ -97,7 +97,7 @@ class Users::FollowingOthersControllerTest < ActionDispatch::IntegrationTest
   test "should destroy follow as json" do
     @user_one.follow(@user_two)
 
-    assert_difference("Follow.count", -1) do
+    assert_difference(-> { @user_one.follows.count }, -1) do
       delete users_following_other_url(@user_two), as: :json
     end
 

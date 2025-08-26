@@ -112,7 +112,7 @@ class Users::SleepsControllerTest < ActionDispatch::IntegrationTest
     patch users_sleep_url(old_sleep),
           params: { sleep: { stopped_at_raw: (2.weeks.ago + 9.hours).iso8601 } },
           as: :json
-    
+
     assert_response :forbidden
   end
 end

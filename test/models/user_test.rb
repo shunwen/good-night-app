@@ -7,8 +7,6 @@ class UserTest < ActiveSupport::TestCase
 
     @user.follow(@other_user)
 
-    assert @other_user.followers.include?(@user)
-
     assert @user.following?(@other_user)
 
     @user.unfollow(@other_user)

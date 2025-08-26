@@ -10,13 +10,13 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   end
 
   test "should get index when user has followings with sleeps" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
     get users_following_others_prev_week_sleeps_url
     assert_response :success
   end
 
   test "should show only sleep records from followed users within previous week" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
 
     # Create a sleep record from previous week for user_two
     prev_week_sleep = @user_two.sleeps.create!(
@@ -43,7 +43,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   end
 
   test "should get index as json" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
 
     get users_following_others_prev_week_sleeps_url, as: :json
     assert_response :success
@@ -61,7 +61,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   end
 
   test "should only show sleep records from previous week" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
 
     prev_week_start = Time.current.prev_week
 
@@ -97,7 +97,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   end
 
   test "should order sleep records by duration descending" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
 
     # Create sleep records from previous week with different durations
     prev_week_start = Time.current.prev_week
@@ -127,7 +127,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   end
 
   test "should sort sleeps without stopped_at_raw or duration at the bottom" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
 
     prev_week_start = Time.current.prev_week
 
@@ -160,7 +160,7 @@ class Users::FollowingOthers::PrevWeekSleepsControllerTest < ActionDispatch::Int
   end
 
   test "should paginate results" do
-    @user_one.following_others << @user_two
+     @user_one.follows.create!(followed_id: @user_two.id)
 
     prev_week_start = Time.current.prev_week
 

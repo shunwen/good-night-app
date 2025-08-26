@@ -1,20 +1,54 @@
-class Follow < ApplicationRecord
-  belongs_to :follower,
-             class_name: "User",
-             inverse_of: :followings
+class Follow
+  FOLLOWS_LIMIT = 5000
 
-  belongs_to :followed,
-             class_name: "User",
-             inverse_of: :follows
+  attr_reader :follower, :shard
 
-  validate :cannot_follow_self
-  validates_uniqueness_of :followed_id, scope: :follower_id
+  def initialize(follower)
+    @follower = follower
+    @shard = :"shard_#{follower.id.to_i % 2}"
+  end
 
-  private
+  def sharded
+    ShardedFollow.where(follower_id: follower.id)
+  end
 
-    def cannot_follow_self
-      if follower_id == followed_id
-        errors.add(:follower, "can't be the same as followed")
-      end
+  def with_shard(&block)
+    ShardRecord.connected_to(shard:, &block)
+  end
+
+  def create!(followed_id:)
+    raise ArgumentError, "Cannot follow self" if follower.id == followed_id
+
+    with_shard do
+      ShardedFollow.create!(follower_id: follower.id, followed_id:)
     end
+  end
+
+  def destroy!(followed_id:)
+    with_shard do
+      sharded.where(followed_id:).destroy_all
+    end
+  end
+
+  def following?(followed_id:)
+    with_shard do
+      sharded.exists?(followed_id:)
+    end
+  end
+
+  def followed_ids
+    with_shard do
+     sharded.pluck(:followed_id)
+    end
+  end
+
+  def following_others
+    @following_others ||= User.where(id: followed_ids)
+  end
+
+  def count
+    with_shard do
+      sharded.count
+    end
+  end
 end
